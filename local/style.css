@@ -1,0 +1,98 @@
+/* NoirNest - Premium Apartment Rentals */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #000000;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #333333;
+}
+
+/* Smooth transitions for all interactive elements */
+a, button {
+    transition: all 0.3s ease;
+}
+
+/* Loading animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+/* Minimalist focus styles */
+button:focus, a:focus {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+}
+
+/* Custom filter section styles */
+.filter-section {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.filter-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.filter-select option {
+    background: #000000;
+    color: white;
+}
+/* Image hover effects */
+.property-image {
+    transition: transform 0.5s ease;
+}
+
+.property-image:hover {
+    transform: scale(1.05);
+}
+
+/* Custom gradient backgrounds */
+.gradient-dark {
+    background: linear-gradient(135deg, #000000 0%, #333333 100%);
+}
+
+.gradient-light {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
