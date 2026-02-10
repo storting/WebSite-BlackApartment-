@@ -1,0 +1,19 @@
+<!-- template element for dynamic rendering -->
+<template id="apartment-template">
+    <div class="group relative bg-noir-900 text-white overflow-hidden transform transition-all duration-500 hover:scale-105">
+        <div class="h-64 bg-noir-800 overflow-hidden">
+            <img src="" alt="" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+        </div>
+        <div class="p-6">
+            <h3 class="text-xl font-bold mb-2"></h3>
+            <p class="text-noir-300 mb-4"></p>
+            <div class="flex items-center justify-between">
+                <span class="text-2xl font-bold"></span>
+                <a href="./apartment-detail.html" class="bg-white text-black px-4 py-2 text-sm font-medium hover:bg-noir-200 transition-all">VIEW DETAILS</a>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Container where the blocks will be rendered -->
+<div id="apartments-container"></div>

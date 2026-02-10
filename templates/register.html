@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - BlackApartment Novosibirsk</title>
+<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-noir-50 min-h-screen flex flex-col">
+    <custom-navbar></custom-navbar>
+    
+    <main class="flex-grow pt-20">
+        <section class="py-20">
+            <div class="container mx-auto px-4 max-w-2xl">
+                <h1 class="text-5xl font-bold text-center mb-12 text-noir-900">CREATE ACCOUNT</h1>
+                <div class="bg-white p-8 border border-noir-200 rounded-lg shadow-lg">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold mb-6 text-center text-noir-900">SELECT USER TYPE</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <button type="button" id="tenantBtn" class="w-full bg-noir-900 text-white px-6 py-4 font-medium hover:bg-noir-800 transition-all duration-300 rounded-lg border-2 border-noir-900">
+                        <div class="text-center text-black">
+                            <i data-feather="user" class="w-8 h-8 mx-auto mb-2"></i>
+                            <span class="text-lg font-semibold">TENANT</span>
+                            <p class="text-sm text-noir-600 mt-2">Looking for your perfect apartment</p>
+                        </div>
+                    </button>
+                    <button type="button" id="landlordBtn" class="w-full border-2 border-noir-300 px-6 py-4 font-medium hover:bg-noir-50 transition-all duration-300 rounded-lg">
+                        <div class="text-center text-black">
+                            <i data-feather="home" class="w-8 h-8 mx-auto mb-2"></i>
+                            <span class="text-lg font-semibold">LANDLORD</span>
+                            <p class="text-sm text-noir-600 mt-2">List and manage your properties</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tenant Registration Form -->
+            <form id="tenantForm" class="space-y-6" method="POST" action="/sumbit/tenant">
+                <h3 class="text-3xl font-bold mb-6 text-center text-noir-900">TENANT REGISTRATION</h3>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">User Name *</label>
+                <input type="text" name="username" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="John123">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Email Address *</label>
+                    <input type="email" name="email" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="Enter your email">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Phone Number *</label>
+                    <input type="tel" name="phone" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="+7 (999) 123-4567">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Full Name *</label>
+                    <input type="text" name="name" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="John Smith">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Password *</label>
+                    <input type="password" name="password" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="Create password">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Confirm Password *</label>
+                    <input type="password" name="confirmPassword" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="Confirm password">
+                </div>
+                <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium  transition-all duration-300 rounded-lg">CREATE ACCOUNT</button>
+            </form>
+
+            <!-- Landlord Registration Form -->
+            <form id="landlordForm" class="space-y-6 hidden" method="POST" action="/sumbit/landlord">
+                <h3 class="text-3xl font-bold mb-6 text-center text-noir-900">LANDLORD REGISTRATION</h3>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">User Name *</label>
+                <input type="text" name="username" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="John123">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Email Address *</label>
+                <input type="email" name="email" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="Enter your email">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Phone Number *</label>
+                <input type="tel" name="phone" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="+7 (999) 123-4567">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Full Name *</label>
+                <input type="text" name="name" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="John Smith">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Date of Birth *</label>
+                <input type="date" name="birth_date" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Password *</label>
+                    <input type="password" name="password" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="Create password">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-2">Confirm Password *</label>
+                    <input type="password" name="confirmPassword" required class="w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" placeholder="Confirm password">
+                </div>
+                <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium  transition-all duration-300 rounded-lg">CREATE ACCOUNT</button>
+            </form>
+            <div class="text-center mt-2">
+                    <p class="text-noir-600">Already have an account? <a href="/log" class="text-noir-900 font-medium hover:underline"><b>Login here</b></a></p>
+                </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<custom-footer></custom-footer>
+
+<script src="{{ url_for('static', filename='js/components/navbar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/footer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+    feather.replace();
+    
+    function showTenantForm() {
+        document.getElementById('tenantForm').classList.remove('hidden');
+        document.getElementById('landlordForm').classList.add('hidden');
+        document.getElementById('tenantBtn').classList.add('bg-noir-900', 'text-white', 'border-noir-900');
+        document.getElementById('tenantBtn').classList.remove('border-noir-300');
+        document.getElementById('landlordBtn').classList.remove('bg-noir-900', 'text-white', 'border-noir-900');
+        document.getElementById('landlordBtn').classList.add('border-noir-300');
+    }
+    
+    function showLandlordForm() {
+        document.getElementById('landlordForm').classList.remove('hidden');
+        document.getElementById('tenantForm').classList.add('hidden');
+        document.getElementById('landlordBtn').classList.add('bg-noir-900', 'text-white', 'border-noir-900');
+        document.getElementById('tenantBtn').classList.remove('bg-noir-900', 'text-white', 'border-noir-900');
+        document.getElementById('tenantBtn').classList.add('border-noir-300');
+        document.getElementById('landlordBtn').classList.remove('border-noir-300');
+    }
+    
+    // Initialize button click handlers
+    document.getElementById('tenantBtn').addEventListener('click', showTenantForm);
+    document.getElementById('landlordBtn').addEventListener('click', showLandlordForm);
+    
+    // Show tenant form by default
+    showTenantForm();
+</script>
+</body>
+</html>
