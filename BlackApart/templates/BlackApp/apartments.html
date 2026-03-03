@@ -1,0 +1,78 @@
+{% extends 'BlackApp/base.html' %}
+
+{% load static %}
+
+{% block title %}Квартиры{% endblock %}
+
+{% block content %}
+<!-- Hero Section (можно убрать или оставить) -->
+<section id="hero" class="relative h-screen flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-60 z-10"></div>
+    <div class="relative z-20 text-center text-white px-4 max-w-4xl">
+        <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">BlackApartment</h1>
+        <p class="text-xl md:text-2xl mb-8 text-noir-200 font-light">Premium Black & White Apartments in the Heart of Novosibirsk</p>
+    </div>
+</section>
+
+<!-- All Apartments -->
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-16 text-noir-900">ALL PROPERTIES</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Здесь будут карточки квартир, можно вынести в отдельный шаблон-включение -->
+            {% include 'BlackApp/includes/apartment_card.html' with apartment=apartment_data %}
+            <!-- Повторить для каждой квартиры -->
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us (опционально) -->
+<section class="py-20 bg-noir-900 text-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-16">WHY CHOOSE NOIRNEST</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-feather="award"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">PREMIUM QUALITY</h3>
+                <p class="text-noir-300">Every apartment meets our strict standards for luxury and comfort</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-feather="map-pin"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">PRIME LOCATIONS</h3>
+                <p class="text-noir-300">Strategic locations across Novosibirsk's most desirable neighborhoods</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-feather="clock"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">24/7 SUPPORT</h3>
+                <p class="text-noir-300">Round-the-clock assistance for all your needs and inquiries</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    VANTA.NET({
+        el: "#hero",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0xffffff,
+        backgroundColor: 0x000000,
+        points: 12.00,
+        maxDistance: 25.00,
+        spacing: 18.00
+    });
+</script>
+{% endblock %}
