@@ -1,118 +1,69 @@
 class CustomNavbar extends HTMLElement {
-  connectedCallback() {
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.innerHTML = `
-      <style>
-        nav {
-          background: rgba(0, 0, 0, 0.95);
-          backdrop-filter: blur(10px);
-          padding: 1rem 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 1000;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    connectedCallback() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.render());
+        } else {
+            this.render();
         }
-        .logo { 
-          color: white; 
-          font-weight: bold; 
-          font-size: 1.5rem;
-          letter-spacing: 2px;
+    }
+
+    render() {
+        this.attachShadow({ mode: 'open' });
+
+        const userDataElement = document.getElementById('user-data');
+        const isAuth = userDataElement?.dataset.isAuthenticated === 'true';
+        const username = userDataElement?.dataset.username || '';
+        const avatarUrl = userDataElement?.dataset.avatarUrl;
+        const profileUrl = userDataElement?.dataset.profileUrl || '/profile/';
+        const logoutUrl = userDataElement?.dataset.logoutUrl || '/logout/';
+        const csrfToken = userDataElement?.dataset.csrf || '';
+
+        let userHtml = '';
+        if (isAuth) {
+            const avatarHtml = avatarUrl
+                ? `<img src="${avatarUrl}" class="avatar" alt="avatar">`
+                : `<i data-feather="user"></i>`;
+            userHtml = `
+                <li class="user-menu">
+                    <a href="${profileUrl}" class="user-info">
+                        ${avatarHtml}
+                        <span class="user-name">${username}</span>
+                    </a>
+                </li>
+                <li><button id="logout-btn" class="logout-btn">Выйти</button></li>
+            `;
+        } else {
+            userHtml = `<li><a class="loginBut" href="/login">LOGIN</a></li>`;
         }
-        ul { 
-          display: flex; 
-          gap: 2rem; 
-          list-style: none; 
-          margin: 0; 
-          padding: 0; 
+
+        // ... весь CSS и структура навбара (как в предыдущих версиях) ...
+        // (код CSS и HTML я опускаю для краткости, он у вас уже есть)
+
+        this.shadowRoot.innerHTML = `...`; // вставьте ваш полный код
+
+        if (typeof feather !== 'undefined') {
+            feather.replace(this.shadowRoot);
         }
-        a { 
-          color: white; 
-          text-decoration: none; 
-          font-weight: 500;
-          position: relative;
-          padding: 0.5rem 0;
+
+        if (isAuth) {
+            const logoutBtn = this.shadowRoot.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = logoutUrl;
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrfmiddlewaretoken';
+                    csrfInput.value = csrfToken;
+                    form.appendChild(csrfInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            }
         }
-        a::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: white;
-          transition: width 0.3s ease;
-        }
-        a:hover::after {
-          width: 100%;
-        }
-        .mobile-menu-btn {
-          display: none;
-          background: none;
-          border: none;
-          color: white;
-          cursor: pointer;
-        }
-        .loginBut{
-            color: black;
-            padding: 10px 20px; 
-            background-color: #ffffff; 
-            border-radius: 4px; 
-            border: none;       
-            cursor: pointer;    
-        }
-        .loginBut:hover {
-            color: rgb(255, 255, 255);
-            background-color: #000000; 
-        }
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .user-name {
-            color: white;
-            font-weight: 500;
-        }
-@media (max-width: 768px) {
-          .mobile-menu-btn {
-            display: block;
-          }
-          ul {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.98);
-            flex-direction: column;
-            padding: 1rem;
-            gap: 1rem;
-          }
-          ul.show {
-            display: flex;
-          }
-          
-        }
-      </style>
-      <nav>
-        <div class="logo"><a href="/">BlackApartment</a></div>
-<button class="mobile-menu-btn" onclick="this.shadowRoot.querySelector('ul').classList.toggle('show')">
-          <i data-feather="menu"></i>
-        </button>
-        <ul>
-          <li><a href="/">HOME</a></li>
-          <li><a href="/apartments">APARTMENTS</a></li>
-<li id="user-menu-item">
-            <a class="loginBut" href="/login">LOGIN</a>
-          </li>
-        </ul>
-</nav>
-    `;
-  }
+    }
 }
+
 customElements.define('custom-navbar', CustomNavbar);

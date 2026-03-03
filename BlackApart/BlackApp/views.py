@@ -49,9 +49,11 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'С возвращением, {user.username}!')
+            print(f'С возвращением, {user.username}!')
             return redirect('index')
         else:
             messages.error(request, 'Неверное имя пользователя или пароль')
+            print(f'Неверное имя пользователя или пароль {username, password}')
     return render(request, 'BlackApp/login.html')
 
 def logout_view(request):

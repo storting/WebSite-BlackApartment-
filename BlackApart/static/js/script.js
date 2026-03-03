@@ -1,12 +1,5 @@
-
-// NoirNest - Shared JavaScript functionality
-
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('NoirNest - Premium Apartment Rentals loaded');
-    
-    // Initialize authentication state
-    initializeAuth();
+    console.log('BlackApartment - Premium Apartment Rentals loaded');
     
     // Add loading animations to elements
     const animatedElements = document.querySelectorAll('.fade-in-up');
@@ -64,10 +57,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }).format(price);
     };
     
-    // API integration for apartment data
+    // API integration for apartment data (можно оставить для будущего использования)
     window.fetchApartments = async function() {
         try {
-            // This would be replaced with actual API endpoint
             const response = await fetch('/api/apartments');
             const apartments = await response.json();
             return apartments;
@@ -87,178 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
     
-    // Authentication functions
-    function initializeAuth() {
-        // Check if user is logged in
-        const user = getCurrentUser();
-        if (user) {
-            updateNavbarForLoggedInUser(user);
-        }
-        
-        // Initialize login form
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.addEventListener('submit', handleLogin);
-        }
-        
-        // Initialize register form
-        const registerForm = document.getElementById('registerForm');
-        if (registerForm) {
-            registerForm.addEventListener('submit', handleRegister);
-        }
-    }
-    
-    // Handle login form submission
-    function handleLogin(e) {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const email = formData.get('email');
-        const password = formData.get('password');
-        
-        // Simple validation
-        if (!email || !password) {
-            alert('Please fill in all fields');
-            return;
-        }
-        
-        // Mock authentication (replace with actual API call)
-        const user = {
-            id: 1,
-            name: 'John Doe',
-            email: email,
-            phone: '+7 (999) 123-4567'
-        };
-        
-        // Store user in localStorage
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        
-        // Redirect to home page
-        window.location.href = '/';
-    }
-    // Handle register form submission
-    function handleRegister(e) {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const userType = e.target.id === 'tenantForm' ? 'tenant' : 'landlord';
-        
-        // Common fields
-        const name = formData.get('name');
-        const email = formData.get('email');
-        const phone = formData.get('phone');
-        const password = formData.get('password');
-        const confirmPassword = formData.get('confirmPassword');
-        
-        // Validation
-        if (!name || !email || !phone || !password || !confirmPassword) {
-            alert('Пожалуйста, заполните все обязательные поля');
-            return;
-        }
-        
-        if (password !== confirmPassword) {
-            alert('Пароли не совпадают');
-            return;
-        }
-        
-        // Tenant specific validation
-        if (userType === 'tenant') {
-            const egrnExtract = formData.get('egrn_extract');
-            if (!egrnExtract || egrnExtract.size === 0) {
-                alert('Пожалуйста, загрузите выписку из ЕГРН');
-                return;
-            }
-        }
-        
-        // Landlord specific validation
-        if (userType === 'landlord') {
-            const birthDate = formData.get('birth_date');
-            const passportData = formData.get('passport_data');
-        const egrnExtract = formData.get('egrn_extract');
-            if (!birthDate) {
-                alert('Пожалуйста, укажите дату рождения');
-                return;
-            }
-            if (!passportData) {
-                alert('Пожалуйста, заполните паспортные данные');
-                return;
-            }
-            if (!egrnExtract || egrnExtract.size === 0) {
-                alert('Пожалуйста, загрузите выписку из ЕГРН');
-                return;
-            }
-        }
-        
-        // Mock registration (replace with actual API call)
-        const user = {
-            id: Date.now(),
-            name: name,
-            email: email,
-            phone: phone,
-            userType: userType
-        };
-        
-        // Store user in localStorage
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        
-        // Redirect to home page
-        window.location.href = '/';
-    }
-
-    function renderApartment(apartmentData) {
-        // Get the template from DOM
-        const template = document.querySelector('#apartment-template').content.cloneNode(true);
-    
-        // Fill in the data into the cloned template
-        const img = template.querySelector('img');
-        img.src = apartmentData.imageUrl || 'default-image.jpg';   // Default image if no URL provided
-        img.alt = apartmentData.title || '';
-    
-        const title = template.querySelector('h3');
-        title.textContent = apartmentData.title || 'No Title Provided';
-    
-        const description = template.querySelector('p');
-        description.textContent = apartmentData.description || '';
-    
-        const price = template.querySelector('.text-2xl');
-        price.textContent = `${apartmentData.price}/month` || '';
-    
-        const link = template.querySelector('a');
-        link.href = './apartment-detail.html?id=' + apartmentData.id;
-        link.textContent = 'VIEW DETAILS';
-    }
-    
-    // Example usage of function
-    const apartment = {
-        id: 1,
-        title: 'Modern Apartment',
-        description: 'Spacious modern flat with great views.',
-        price: '₽45,000',
-        imageUrl: 'http://example.com/images/apartment1.jpg'
-    };
-
-// Get current user from localStorage
-    function getCurrentUser() {
-        const userJson = localStorage.getItem('currentUser');
-        return userJson ? JSON.parse(userJson) : null;
-    }
-    
-    // Update navbar for logged in user
-    function updateNavbarForLoggedInUser(user) {
-        const userMenuItem = document.getElementById('user-menu-item');
-        if (userMenuItem) {
-            userMenuItem.innerHTML = `
-                <div class="user-menu">
-                    <span class="user-name">Hello, ${user.name}</span>
-                    <button class="loginBut" onclick="handleLogout()">LOGOUT</button>
-                </div>
-            `;
-        }
-    }
-    // Handle logout
-    window.handleLogout = function() {
-        localStorage.removeItem('currentUser');
-        window.location.href = '/';
-    };
-
     // Calendar functionality for apartment details
     window.generateCalendar = function(bookedDates) {
         const calendarDays = document.getElementById('calendarDays');
@@ -289,10 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
             calendarDays.appendChild(dayElement);
         }
     };
-// Fetch apartment details from API
+    
+    // Fetch apartment details from API
     window.fetchApartmentDetails = async function(apartmentId) {
         try {
-            // This would be replaced with actual API endpoint
             const response = await fetch(`/api/apartments/${apartmentId}`);
             const apartment = await response.json();
             return apartment;
@@ -301,17 +121,26 @@ document.addEventListener('DOMContentLoaded', function() {
             return null;
         }
     };
-// Check if user is logged in
-    window.isLoggedIn = function() {
-        return getCurrentUser() !== null;
-    };
     
-    // Redirect if not logged in
-    window.requireAuth = function() {
-        if (!isLoggedIn()) {
-            window.location.href = "/log";
-            return false;
-        }
-        return true;
+    // Функция renderApartment (если используется)
+    window.renderApartment = function(apartmentData) {
+        const template = document.querySelector('#apartment-template').content.cloneNode(true);
+    
+        const img = template.querySelector('img');
+        img.src = apartmentData.imageUrl || 'default-image.jpg';
+        img.alt = apartmentData.title || '';
+    
+        const title = template.querySelector('h3');
+        title.textContent = apartmentData.title || 'No Title Provided';
+    
+        const description = template.querySelector('p');
+        description.textContent = apartmentData.description || '';
+    
+        const price = template.querySelector('.text-2xl');
+        price.textContent = `${apartmentData.price}/month` || '';
+    
+        const link = template.querySelector('a');
+        link.href = './apartment-detail.html?id=' + apartmentData.id;
+        link.textContent = 'VIEW DETAILS';
     };
 });
