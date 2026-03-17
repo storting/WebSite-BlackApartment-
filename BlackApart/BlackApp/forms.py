@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, TenantProfile, LandlordProfile
+from .models import User, TenantProfile, LandlordProfile, Property, PropertyImage, Document, Favorite, Booking, Review
 import json
 
 class TenantRegistrationForm(UserCreationForm):
@@ -84,3 +84,29 @@ class LandlordRegistrationForm(UserCreationForm):
             user.save()
             LandlordProfile.objects.get_or_create(user=user)
         return user
+
+class PropertyForm(forms.ModelForm):
+    class Meta:
+        model = Property
+        fields = [
+            'title', 'description', 'address', 'property_type', 'price',
+            'rooms', 'area', 'floor', 'floors_total',
+            'has_furniture', 'has_appliances', 'allows_pets', 'allows_children',
+            'egrn_number', 'egrn_file'
+        ]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4}),
+        }
+
+class PropertyImageForm(forms.ModelForm):
+    class Meta:
+        model = PropertyImage
+        fields = ['image', 'is_main']
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ['doc_type', 'file']
+        widgets = {
+            'doc_type': forms.Select(attrs={'class': 'w-full border rounded-xl px-4 py-3'}),
+        }

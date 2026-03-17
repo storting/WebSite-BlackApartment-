@@ -16,15 +16,16 @@
 </head>
 <body class="bg-noir-50 min-h-screen flex flex-col">
 
-    <!-- Скрытые данные пользователя (должны быть до скрипта navbar.js) -->
     <div id="user-data"
-         data-is-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
-         data-username="{{ user.username|escape }}"
-         data-avatar-url="{% if user.avatar %}{{ user.avatar.url }}{% endif %}"
-         data-profile-url="{% url 'profile' %}"
-         data-logout-url="{% url 'logout' %}"
-         data-csrf="{{ csrf_token }}"
-         style="display: none;"></div>
+     data-is-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
+     data-username="{{ user.username|escape }}"
+     data-first-name="{{ user.first_name|escape }}"
+     data-last-name="{{ user.last_name|escape }}"
+     data-avatar-url="{% if user.avatar %}{{ user.avatar.url }}{% endif %}"
+     data-profile-url="{% url 'profile' %}"
+     data-logout-url="{% url 'logout' %}"
+     data-csrf="{{ csrf_token }}"
+     style="display: none;"></div>
 
     {% include 'BlackApp/includes/navbar.html' %}
 
@@ -43,8 +44,6 @@
     </main>
 
     {% include 'BlackApp/includes/footer.html' %}
-
-    <!-- Подключаем скрипты ОДИН раз -->
     <script src="{% static 'js/components/navbar.js' %}"></script>
     <script src="{% static 'js/components/footer.js' %}"></script>
     <script src="{% static 'js/script.js' %}"></script>

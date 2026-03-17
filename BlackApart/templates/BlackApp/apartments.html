@@ -1,78 +1,58 @@
 {% extends 'BlackApp/base.html' %}
-
 {% load static %}
 
-{% block title %}Квартиры{% endblock %}
+{% block title %}Квартиры в Новосибирске{% endblock %}
 
 {% block content %}
-<!-- Hero Section (можно убрать или оставить) -->
-<section id="hero" class="relative h-screen flex items-center justify-center overflow-hidden">
-    <div class="absolute inset-0 bg-black opacity-60 z-10"></div>
-    <div class="relative z-20 text-center text-white px-4 max-w-4xl">
-        <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">BlackApartment</h1>
-        <p class="text-xl md:text-2xl mb-8 text-noir-200 font-light">Premium Black & White Apartments in the Heart of Novosibirsk</p>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-center mb-8">Наши квартиры</h1>
+    
+    <!-- Форма фильтрации -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <input type="text" name="q" placeholder="Поиск по адресу" value="{{ request.GET.q }}" class="border rounded-lg px-4 py-2">
+            
+            <select name="type" class="border rounded-lg px-4 py-2">
+                <option value="">Все типы</option>
+                {% for code, name in property_types %}
+                <option value="{{ code }}" {% if request.GET.type == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="number" name="min_price" placeholder="Цена от" value="{{ request.GET.min_price }}" class="border rounded-lg px-4 py-2">
+            <input type="number" name="max_price" placeholder="Цена до" value="{{ request.GET.max_price }}" class="border rounded-lg px-4 py-2">
+            
+            <input type="number" name="rooms" placeholder="Комнат" value="{{ request.GET.rooms }}" class="border rounded-lg px-4 py-2">
+            
+            <button type="submit" class="md:col-span-1 bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition">Применить</button>
+        </form>
     </div>
-</section>
-
-<!-- All Apartments -->
-<section class="py-20 bg-white">
-    <div class="container mx-auto px-4">
-        <h2 class="text-4xl font-bold text-center mb-16 text-noir-900">ALL PROPERTIES</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Здесь будут карточки квартир, можно вынести в отдельный шаблон-включение -->
-            {% include 'BlackApp/includes/apartment_card.html' with apartment=apartment_data %}
-            <!-- Повторить для каждой квартиры -->
-        </div>
-    </div>
-</section>
-
-<!-- Why Choose Us (опционально) -->
-<section class="py-20 bg-noir-900 text-white">
-    <div class="container mx-auto px-4">
-        <h2 class="text-4xl font-bold text-center mb-16">WHY CHOOSE NOIRNEST</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center">
-                <div class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-feather="award"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-4">PREMIUM QUALITY</h3>
-                <p class="text-noir-300">Every apartment meets our strict standards for luxury and comfort</p>
+    
+    <!-- Список объектов -->
+    {% if properties %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for prop in properties %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden transform transition hover:scale-105">
+            <div class="h-48 overflow-hidden">
+                {% if prop.images.all %}
+                <img src="{{ prop.images.first.image.url }}" alt="{{ prop.title }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600">Нет фото</div>
+                {% endif %}
             </div>
-            <div class="text-center">
-                <div class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-feather="map-pin"></i>
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2">{{ prop.title }}</h3>
+                <p class="text-gray-600 mb-4">{{ prop.address }}</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-2xl font-bold">{{ prop.price }} ₽/сут</span>
+                    <a href="{% url 'apartment_detail' prop.id %}" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">Подробнее</a>
                 </div>
-                <h3 class="text-xl font-bold mb-4">PRIME LOCATIONS</h3>
-                <p class="text-noir-300">Strategic locations across Novosibirsk's most desirable neighborhoods</p>
-            </div>
-            <div class="text-center">
-                <div class="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-feather="clock"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-4">24/7 SUPPORT</h3>
-                <p class="text-noir-300">Round-the-clock assistance for all your needs and inquiries</p>
             </div>
         </div>
+        {% endfor %}
     </div>
-</section>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-    VANTA.NET({
-        el: "#hero",
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        color: 0xffffff,
-        backgroundColor: 0x000000,
-        points: 12.00,
-        maxDistance: 25.00,
-        spacing: 18.00
-    });
-</script>
+    {% else %}
+    <p class="text-center text-gray-500 py-12">Квартиры не найдены</p>
+    {% endif %}
+</div>
 {% endblock %}

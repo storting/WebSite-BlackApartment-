@@ -73,7 +73,7 @@ class CustomFooter extends HTMLElement {
           <div class="footer-content">
             <div class="footer-section">
               <h3>BLACKAPARTMENT</h3>
-              <p>Premium apartment rentals in Novosibirsk. Experience luxury living in black and white.</p>
+              <p>Аренда квартир премиум-класса в Новосибирске. Насладитесь роскошной жизнью в черно-белых тонах.</p>
   </div>
             <div class="footer-section">
               <h3>CONTACT INFO</h3>
@@ -83,13 +83,13 @@ class CustomFooter extends HTMLElement {
             </div>
             <div class="footer-section">
               <h3>QUICK LINKS</h3>
-              <p><a href="./apart">Browse Apartments</a></p>
-              <p><a href="./log">Login</a></p>
-              <p><a href="./reg">Register</a></p>
+              <p><a href="./apart">Посмотреть объекты</a></p>
+              <p><a href="./log">Войти</a></p>
+              <p><a href="./reg">Зарегистрироваться</a></p>
             </div>
   </div>
           <div class="copyright">
-            <p>&copy; 2024 NoirNest Novosibirsk. All rights reserved.</p>
+            <p>&copy; 2024 NoirNest Novosibirsk. MobileMonsters.</p>
           </div>
         </footer>
       `;

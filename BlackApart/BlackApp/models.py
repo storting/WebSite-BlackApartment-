@@ -1,10 +1,15 @@
-# main/models.py
+import os, re, shutil
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, EmailValidator, MinLengthValidator
 from django.core.exceptions import ValidationError
-import re
-from datetime import date, timezone
+from django.core.files import File
+from io import BytesIO
+from django.utils import timezone
+from PIL import Image as PilImage
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from django.conf import settings
 
 class User(AbstractUser):
     USER_TYPES = (
@@ -228,8 +233,10 @@ class Property(models.Model):
     area = models.FloatField('Площадь (м²)')
     floor = models.PositiveSmallIntegerField('Этаж', null=True, blank=True)
     floors_total = models.PositiveSmallIntegerField('Этажей в доме', null=True, blank=True)
-    furniture = models.BooleanField('Мебель', default=True)
-    technique = models.BooleanField('Техника', default=True)
+    has_furniture = models.BooleanField('С мебелью', default=False)
+    has_appliances = models.BooleanField('С техникой', default=False)
+    allows_pets = models.BooleanField('Можно с животными', default=False)
+    allows_children = models.BooleanField('Можно с детьми', default=True)
     
     # Данные ЕГРН (SYS-NFR-06)
     egrn_number = models.CharField(
@@ -239,8 +246,8 @@ class Property(models.Model):
         help_text='Выписка из Единого государственного реестра недвижимости'
     )
     egrn_file = models.FileField(
-        'Файл ЕГРН', 
-        upload_to='egrn/%Y/%m/',
+        'Файл ЕГРН',
+        upload_to='temp/egrn/%Y/%m/',
         help_text='Загрузите выписку из ЕГРН'
     )
     egrn_verified = models.BooleanField('ЕГРН проверен', default=False)
@@ -293,18 +300,48 @@ class Property(models.Model):
         if self.moderation_status == 'approved' and not self.published_at:
             self.published_at = timezone.now()
         super().save(*args, **kwargs)
+    
+    def move_files_to_property_folder(self):
+        """Перемещает все файлы объекта в папку properties/<id>/"""
+        target_dir = os.path.join(settings.MEDIA_ROOT, 'properties', str(self.id))
+        os.makedirs(target_dir, exist_ok=True)
 
+        for img in self.images.all():
+            # оригинал
+            old_path = img.image.path
+            if os.path.dirname(old_path) != target_dir:
+                new_name = os.path.basename(old_path)
+                new_path = os.path.join(target_dir, new_name)
+                shutil.move(old_path, new_path)
+                img.image.name = os.path.join('properties', str(self.id), new_name)
+
+            # миниатюра
+            if img.thumbnail and img.thumbnail.name:
+                old_thumb_path = img.thumbnail.path
+                if os.path.dirname(old_thumb_path) != target_dir:
+                    new_thumb_name = os.path.basename(old_thumb_path)
+                    new_thumb_path = os.path.join(target_dir, new_thumb_name)
+                    shutil.move(old_thumb_path, new_thumb_path)
+                    img.thumbnail.name = os.path.join('properties', str(self.id), new_thumb_name)
+
+            img.save()
+
+        if self.egrn_file and self.egrn_file.name:
+            old_path = self.egrn_file.path
+            if os.path.dirname(old_path) != target_dir:
+                new_name = os.path.basename(old_path)
+                new_path = os.path.join(target_dir, new_name)
+                shutil.move(old_path, new_path)
+                self.egrn_file.name = os.path.join('properties', str(self.id), new_name)
+                self.save(update_fields=['egrn_file'])
 
 class PropertyImage(models.Model):
-    """
-    Фотографии объекта (оптимизация загрузки - LAN-NFR-01)
-    """
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField('Фото', upload_to='properties/%Y/%m/')
-    thumbnail = models.ImageField('Миниатюра', upload_to='properties/thumbnails/%Y/%m/', null=True, blank=True)
+    image = models.ImageField('Фото', upload_to='temp/%Y/%m/%d/')
+    thumbnail = models.ImageField('Миниатюра', upload_to='temp/thumbnails/%Y/%m/%d/', null=True, blank=True)
     is_main = models.BooleanField('Главное фото', default=False)
     sort_order = models.PositiveSmallIntegerField('Порядок', default=0)
-    
+
     class Meta:
         verbose_name = 'Фото'
         verbose_name_plural = 'Фото'
@@ -312,9 +349,40 @@ class PropertyImage(models.Model):
         indexes = [
             models.Index(fields=['property', 'is_main']),
         ]
-    
+
     def __str__(self):
         return f"Фото {self.sort_order} для {self.property.address}"
+
+    def save(self, *args, **kwargs):
+        # Сначала сохраняем, чтобы получить ID (нужен для пути)
+        super().save(*args, **kwargs)
+
+        # Если есть изображение и нет миниатюры – создаём
+        if self.image and not self.thumbnail:
+            self.create_thumbnail()
+            # Сохраняем снова, чтобы записать thumbnail
+            super().save(update_fields=['thumbnail'])
+
+    def create_thumbnail(self):
+        try:
+            # Открываем оригинал
+            img = PilImage.open(self.image.path)
+            # Определяем размер миниатюры (например, 300x300)
+            img.thumbnail((300, 300), PilImage.Resampling.LANCZOS)
+
+            # Сохраняем в BytesIO
+            thumb_io = BytesIO()
+            img.save(thumb_io, format='JPEG', quality=85)
+            
+            # Генерируем имя файла для миниатюры
+            filename = os.path.basename(self.image.name)
+            name, ext = os.path.splitext(filename)
+            thumb_filename = f"{name}_thumb.jpg"
+            
+            # Сохраняем в поле thumbnail
+            self.thumbnail.save(thumb_filename, File(thumb_io), save=False)
+        except Exception as e:
+            print(f"Ошибка создания миниатюры: {e}")
 
 
 class Document(models.Model):
@@ -384,55 +452,36 @@ class Favorite(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.property.address}"
 
-
-class ViewingRequest(models.Model):
-    """
-    Запрос на просмотр (для арендаторов)
-    """
+class Booking(models.Model):
     STATUSES = (
-        ('new', 'Новый'),
-        ('confirmed', 'Подтвержден'),
-        ('completed', 'Состоялся'),
-        ('cancelled', 'Отменен'),
+        ('pending', 'Ожидает подтверждения'),
+        ('confirmed', 'Подтверждено'),
+        ('cancelled', 'Отменено'),
+        ('completed', 'Завершено'),
     )
-    
-    # Кто запрашивает (арендатор)
+
     tenant = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='viewing_requests',
+        User,
+        on_delete=models.CASCADE,
+        related_name='bookings',
         limit_choices_to={'user_type': 'tenant'}
     )
-    
-    # Какой объект
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
-    
-    # Детали запроса
-    desired_date = models.DateTimeField('Желаемая дата')
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='bookings')
+    start_date = models.DateField('Дата заезда')
+    end_date = models.DateField('Дата выезда')
     message = models.TextField('Сообщение', blank=True)
-    status = models.CharField('Статус', max_length=20, choices=STATUSES, default='new', db_index=True)
-    
-    # Ответ арендодателя
+    status = models.CharField('Статус', max_length=20, choices=STATUSES, default='pending', db_index=True)
     response_message = models.TextField('Ответ', blank=True)
-    confirmed_date = models.DateTimeField('Подтвержденная дата', null=True, blank=True)
-    
-    # Даты
     created_at = models.DateTimeField('Создан', auto_now_add=True)
     updated_at = models.DateTimeField('Обновлен', auto_now=True)
-    
-    class Meta:
-        verbose_name = 'Запрос на просмотр'
-        verbose_name_plural = 'Запросы на просмотр'
-        ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['tenant', 'status']),
-            models.Index(fields=['property', 'status']),
-            models.Index(fields=['desired_date']),
-        ]
-    
-    def __str__(self):
-        return f"{self.tenant.username} -> {self.property.address}"
 
+    class Meta:
+        verbose_name = 'Бронирование'
+        verbose_name_plural = 'Бронирования'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.tenant.username} - {self.property.address} ({self.start_date} - {self.end_date})"
 
 class Review(models.Model):
     """
@@ -483,3 +532,10 @@ class Review(models.Model):
     
     def __str__(self):
         return f"{self.author.username} -> {self.landlord.username}: {self.rating}★"
+
+@receiver(post_delete, sender=Property)
+def delete_property_folder(sender, instance, **kwargs):
+    """Удаляет папку с файлами объекта при удалении объекта"""
+    folder_path = os.path.join(settings.MEDIA_ROOT, 'properties', str(instance.id))
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)

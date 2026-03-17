@@ -19,23 +19,23 @@
     <main class="flex-grow pt-20">
         <section class="py-20">
             <div class="container mx-auto px-4 max-w-2xl">
-                <h1 class="text-5xl font-bold text-center mb-12 text-noir-900">CREATE ACCOUNT</h1>
+                <h1 class="text-5xl font-bold text-center mb-12 text-noir-900">РЕГИСТРАЦИЯ</h1>
                 <div class="bg-white p-8 border border-noir-200 rounded-lg shadow-lg">
                     <div class="mb-8">
-                        <h2 class="text-2xl font-bold mb-6 text-center text-noir-900">SELECT USER TYPE</h2>
+                        <h2 class="text-2xl font-bold mb-6 text-center text-noir-900">А КАКУЮ ЮСТОРОНУ ПРИМЕШЬ ТЫ?</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <button type="button" id="tenantBtn" class="w-full bg-noir-900 text-white px-6 py-4 font-medium hover:bg-noir-800 transition-all duration-300 rounded-lg border-2 border-noir-900">
                                 <div class="text-center text-black">
                                     <i data-feather="user" class="w-8 h-8 mx-auto mb-2"></i>
-                                    <span class="text-lg font-semibold">TENANT</span>
-                                    <p class="text-sm text-noir-600 mt-2">Looking for your perfect apartment</p>
+                                    <span class="text-lg font-semibold">АРЕНДАТОР</span>
+                                    <p class="text-sm text-noir-600 mt-2">Ищете свою идеальную квартиру</p>
                                 </div>
                             </button>
                             <button type="button" id="landlordBtn" class="w-full border-2 border-noir-300 px-6 py-4 font-medium hover:bg-noir-50 transition-all duration-300 rounded-lg">
                                 <div class="text-center text-black">
                                     <i data-feather="home" class="w-8 h-8 mx-auto mb-2"></i>
-                                    <span class="text-lg font-semibold">LANDLORD</span>
-                                    <p class="text-sm text-noir-600 mt-2">List and manage your properties</p>
+                                    <span class="text-lg font-semibold">АРЕНДОДАТЕЛЬ</span>
+                                    <p class="text-sm text-noir-600 mt-2">Составляйте список своих объектов и управляйте ими</p>
                                 </div>
                             </button>
                         </div>
@@ -44,100 +44,100 @@
                     <!-- Tenant Registration Form -->
                     <form id="tenantForm" class="space-y-6" method="POST" action="{% url 'register_tenant' %}">
                         {% csrf_token %}
-                        <h3 class="text-3xl font-bold mb-6 text-center text-noir-900">TENANT REGISTRATION</h3>
+                        <h3 class="text-3xl font-bold mb-6 text-center text-noir-900">АРЕНДАТОР РЕГИСТРАЦИЯ</h3>
                         
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">User Name *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Имя пользователя (ЗАПОМНИ!) *</label>
                             {{ form.username|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.username.errors %}<div class="text-red-600 text-sm">{{ form.username.errors }}</div>{% endif %}
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Email Address *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Почта *</label>
                             {{ form.email|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.email.errors %}<div class="text-red-600 text-sm">{{ form.email.errors }}</div>{% endif %}
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Phone Number *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Номер телефона *</label>
                             {{ form.phone|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.phone.errors %}<div class="text-red-600 text-sm">{{ form.phone.errors }}</div>{% endif %}
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-noir-700 mb-2">First Name *</label>
+                                <label class="block text-sm font-medium text-noir-700 mb-2">Имя *</label>
                                 {{ form.first_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                                 {% if form.first_name.errors %}<div class="text-red-600 text-sm">{{ form.first_name.errors }}</div>{% endif %}
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-noir-700 mb-2">Last Name *</label>
+                                <label class="block text-sm font-medium text-noir-700 mb-2">Фамилия *</label>
                                 {{ form.last_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                                 {% if form.last_name.errors %}<div class="text-red-600 text-sm">{{ form.last_name.errors }}</div>{% endif %}
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Password *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Пароль *</label>
                             {{ form.password1|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.password1.errors %}<div class="text-red-600 text-sm">{{ form.password1.errors }}</div>{% endif %}
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Confirm Password *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Подтверждение пароля *</label>
                             {{ form.password2|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.password2.errors %}<div class="text-red-600 text-sm">{{ form.password2.errors }}</div>{% endif %}
                         </div>
-                        <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium transition-all duration-300 rounded-lg">CREATE ACCOUNT</button>
+                        <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium transition-all duration-300 rounded-lg">СОЗДАТЬ АККАУНТ</button>
                     </form>
 
                     <!-- Landlord Registration Form -->
                     <form id="landlordForm" class="space-y-6 hidden" method="POST" action="{% url 'register_landlord' %}">
                         {% csrf_token %}
-                        <h3 class="text-3xl font-bold mb-6 text-center text-noir-900">LANDLORD REGISTRATION</h3>
+                        <h3 class="text-3xl font-bold mb-6 text-center text-noir-900">АРЕНДОДАТЕЛЬ РЕГИСТРАЦИЯ</h3>
                         
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">User Name *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Имя пользователя (ЗАПОМНИ!) *</label>
                             {{ form.username|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.username.errors %}<div class="text-red-600 text-sm">{{ form.username.errors }}</div>{% endif %}
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Email Address *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Почта *</label>
                             {{ form.email|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.email.errors %}<div class="text-red-600 text-sm">{{ form.email.errors }}</div>{% endif %}
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Phone Number *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Номер телефона *</label>
                             {{ form.phone|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.phone.errors %}<div class="text-red-600 text-sm">{{ form.phone.errors }}</div>{% endif %}
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-noir-700 mb-2">First Name *</label>
+                                <label class="block text-sm font-medium text-noir-700 mb-2">Имя *</label>
                                 {{ form.first_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                                 {% if form.first_name.errors %}<div class="text-red-600 text-sm">{{ form.first_name.errors }}</div>{% endif %}
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-noir-700 mb-2">Last Name *</label>
+                                <label class="block text-sm font-medium text-noir-700 mb-2">Фамилия *</label>
                                 {{ form.last_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                                 {% if form.last_name.errors %}<div class="text-red-600 text-sm">{{ form.last_name.errors }}</div>{% endif %}
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Date of Birth *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Дата рождения *</label>
                             {{ form.birth_date|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.birth_date.errors %}<div class="text-red-600 text-sm">{{ form.birth_date.errors }}</div>{% endif %}
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Password *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Пароль *</label>
                             {{ form.password1|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.password1.errors %}<div class="text-red-600 text-sm">{{ form.password1.errors }}</div>{% endif %}
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-noir-700 mb-2">Confirm Password *</label>
+                            <label class="block text-sm font-medium text-noir-700 mb-2">Подтверждение пароля *</label>
                             {{ form.password2|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.password2.errors %}<div class="text-red-600 text-sm">{{ form.password2.errors }}</div>{% endif %}
                         </div>
-                        <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium transition-all duration-300 rounded-lg">CREATE ACCOUNT</button>
+                        <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium transition-all duration-300 rounded-lg">СОЗДАТЬ АККАУНТ</button>
                     </form>
 
                     <div class="text-center mt-2">
-                        <p class="text-noir-600">Already have an account? <a href="{% url 'login' %}" class="text-noir-900 font-medium hover:underline"><b>Login here</b></a></p>
+                        <p class="text-noir-600">Уже есть аккаунт? <a href="{% url 'login' %}" class="text-noir-900 font-medium hover:underline"><b>Войти</b></a></p>
                     </div>
                 </div>
             </div>

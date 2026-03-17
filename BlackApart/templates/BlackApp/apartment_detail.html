@@ -1,0 +1,369 @@
+{% extends 'BlackApp/base.html' %}
+{% load static %}
+
+{% block title %}{{ property.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .gallery-thumb {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s, border-color 0.2s;
+        border: 2px solid transparent;
+        height: 80px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 0.5rem;
+    }
+    .gallery-thumb:hover {
+        opacity: 0.9;
+    }
+    .gallery-thumb.active {
+        opacity: 1;
+        border-color: #000;
+    }
+    .main-image-container {
+        height: 400px;
+        background-color: #f3f4f6; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+    .main-image-container img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+    .info-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: box-shadow 0.2s;
+    }
+    .info-card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .feature-item {
+        background: #f9fafb;
+        border-radius: 0.75rem;
+        padding: 1rem 0.5rem;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    .feature-item:hover {
+        background: #f3f4f6; 
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pt-28 container mx-auto px-4 max-w-7xl">
+    <!-- Хлебные крошки -->
+    <nav class="text-sm text-noir-500 mb-6">
+        <ol class="list-none p-0 inline-flex flex-wrap">
+            <li class="flex items-center">
+                <a href="{% url 'index' %}" class="hover:text-noir-900 transition">Главная</a>
+                <svg class="w-4 h-4 mx-2 fill-current" viewBox="0 0 20 20"><path d="M7 5l5 5-5 5V5z"/></svg>
+            </li>
+            <li class="flex items-center">
+                <a href="{% url 'apartment_list' %}" class="hover:text-noir-900 transition">Квартиры</a>
+                <svg class="w-4 h-4 mx-2 fill-current" viewBox="0 0 20 20"><path d="M7 5l5 5-5 5V5z"/></svg>
+            </li>
+            <li class="flex items-center text-noir-900 font-medium truncate max-w-[250px]">{{ property.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Карточка галереи -->
+    <div class="info-card mb-8">
+        {% if property.images.all %}
+        <div class="main-image-container mb-4">
+            <img id="mainImage" src="{{ property.images.first.image.url }}" alt="{{ property.title }}">
+        </div>
+        <div class="grid grid-cols-6 gap-2">
+            {% for image in property.images.all %}
+            <img src="{{ image.thumbnail.url|default:image.image.url }}" 
+                 alt="Миниатюра" 
+                 class="gallery-thumb {% if forloop.first %}active{% endif %}"
+                 onclick="document.getElementById('mainImage').src='{{ image.image.url }}'; document.querySelectorAll('.gallery-thumb').forEach(el => el.classList.remove('active')); this.classList.add('active');">
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="main-image-container flex items-center justify-center">
+            <span class="text-noir-500">Нет фотографий</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Заголовок и цена (вне карточки, но можно объединить) -->
+    <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+        <div>
+            <h1 class="text-4xl font-bold text-noir-900">{{ property.title }}</h1>
+            <div class="flex items-center gap-1 text-noir-500 text-base mt-2">
+                <i data-feather="map-pin" width="18"></i>
+                <span>{{ property.address }}</span>
+            </div>
+        </div>
+        <div class="bg-noir-900 text-black px-6 py-3 rounded-xl whitespace-nowrap shadow-lg">
+            <span class="text-3xl font-bold">{{ property.price }}</span>
+            <span class="text-sm text-noir-300 ml-1">₽/сут</span>
+        </div>
+    </div>
+
+    <!-- Кнопки действий (только для арендатора) -->
+    {% if user.is_authenticated and user.user_type == 'tenant' %}
+    <div class="flex gap-4 mb-8">
+        {% if is_favorite %}
+        <form method="post" action="{% url 'remove_from_favorites' property.id %}">
+            {% csrf_token %}
+            <button type="submit" class="flex items-center justify-center w-12 h-12 bg-red-500 text-white rounded-xl hover:bg-red-600 transition" title="Удалить из избранного">
+                <i data-feather="heart" width="24" fill="currentColor"></i>
+            </button>
+        </form>
+        {% else %}
+        <form method="post" action="{% url 'add_to_favorites' property.id %}">
+            {% csrf_token %}
+            <button type="submit" class="flex items-center gap-2 px-5 py-3 border-2 border-noir-900 rounded-xl text-base font-medium bg-white text-noir-900 hover:bg-noir-900 hover:text-white transition">
+                <i data-feather="heart" width="20"></i> В избранное
+            </button>
+        </form>
+        {% endif %}
+        
+        <a href="{% url 'create_booking' property.id %}" class="flex items-center gap-2 px-5 py-3 bg-noir-900 text-black rounded-xl text-base font-medium hover:bg-noir-800 transition" title="Посмотреть записи">
+            <i data-feather="calendar" width="20"></i> Запросить просмотр
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Характеристики (карточки) -->
+    <div class="info-card mb-8">
+        <h2 class="text-2xl font-bold mb-6 text-noir-800 flex items-center gap-2">
+            <i data-feather="info"></i> Характеристики
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="feature-item">
+                <i data-feather="home" class="w-6 h-6 mx-auto mb-2 text-noir-700"></i>
+                <span class="block text-xs text-noir-500">Тип</span>
+                <span class="block text-base font-semibold text-noir-800">{{ property.get_property_type_display }}</span>
+            </div>
+            <div class="feature-item">
+                <i data-feather="maximize" class="w-6 h-6 mx-auto mb-2 text-noir-700"></i>
+                <span class="block text-xs text-noir-500">Площадь</span>
+                <span class="block text-base font-semibold text-noir-800">{{ property.area }} м²</span>
+            </div>
+            <div class="feature-item">
+                <i data-feather="layers" class="w-6 h-6 mx-auto mb-2 text-noir-700"></i>
+                <span class="block text-xs text-noir-500">Этаж</span>
+                <span class="block text-base font-semibold text-noir-800">{{ property.floor|default:"—" }}/{{ property.floors_total|default:"—" }}</span>
+            </div>
+            <div class="feature-item">
+                <i data-feather="hash" class="w-6 h-6 mx-auto mb-2 text-noir-700"></i>
+                <span class="block text-xs text-noir-500">Комнат</span>
+                <span class="block text-base font-semibold text-noir-800">{{ property.rooms|default:"—" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Две колонки: описание и удобства -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <!-- Описание -->
+        <div class="lg:col-span-2 info-card">
+            <h2 class="text-2xl font-bold mb-4 text-noir-800 flex items-center gap-2">
+                <i data-feather="file-text"></i> Описание
+            </h2>
+            <div class="text-noir-700 text-base leading-relaxed max-h-80 overflow-y-auto pr-2">
+                {{ property.description|linebreaks }}
+            </div>
+        </div>
+
+        <!-- Удобства -->
+        <div class="info-card">
+            <h2 class="text-2xl font-bold mb-4 text-noir-800 flex items-center gap-2">
+                <i data-feather="check-circle"></i> Удобства
+            </h2>
+            <div class="space-y-3 text-base">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 bg-noir-100 rounded-full flex items-center justify-center text-noir-600">
+                        <i data-feather="coffee" width="18"></i>
+                    </span>
+                    <span class="text-noir-700">Мебель: {% if property.has_furniture %}<span class="text-green-600 font-medium">есть</span>{% else %}<span class="text-red-600 font-medium">нет</span>{% endif %}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 bg-noir-100 rounded-full flex items-center justify-center text-noir-600">
+                        <i data-feather="zap" width="18"></i>
+                    </span>
+                    <span class="text-noir-700">Техника: {% if property.has_appliances %}<span class="text-green-600 font-medium">есть</span>{% else %}<span class="text-red-600 font-medium">нет</span>{% endif %}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 bg-noir-100 rounded-full flex items-center justify-center text-noir-600">
+                        <i data-feather="heart" width="18"></i>
+                    </span>
+                    <span class="text-noir-700">Животные: {% if property.allows_pets %}<span class="text-green-600 font-medium">разрешены</span>{% else %}<span class="text-red-600 font-medium">запрещены</span>{% endif %}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 bg-noir-100 rounded-full flex items-center justify-center text-noir-600">
+                        <i data-feather="users" width="18"></i>
+                    </span>
+                    <span class="text-noir-700">Дети: {% if property.allows_children %}<span class="text-green-600 font-medium">разрешены</span>{% else %}<span class="text-red-600 font-medium">запрещены</span>{% endif %}</span>
+                </div>
+            </div>
+            {% if property.egrn_file and property.egrn_verified %}
+            <div class="mt-6 pt-4 border-t border-noir-200">
+                <a href="{{ property.egrn_file.url }}" target="_blank" class="flex items-center gap-2 text-noir-700 hover:text-noir-900 transition">
+                    <i data-feather="file-text" width="18"></i>
+                    <span>Выписка ЕГРН</span>
+                    <i data-feather="external-link" width="14" class="ml-auto"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Нижний ряд: расположение и арендодатель -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Расположение -->
+        <div class="info-card">
+            <h2 class="text-2xl font-bold mb-4 text-noir-800 flex items-center gap-2">
+                <i data-feather="map-pin"></i> Расположение
+            </h2>
+            <p class="text-noir-700 text-base mb-4">{{ property.address }}</p>
+            <div class="h-48 bg-noir-100 rounded-xl flex items-center justify-center text-noir-500">
+                Карта будет здесь
+            </div>
+        </div>
+
+        <!-- Интерактивный календарь занятости -->
+        <div class="info-card mt-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-noir-800 flex items-center gap-2">
+                    <i data-feather="calendar"></i> Календарь занятости
+                </h2>
+                <div class="flex items-center gap-2">
+                    <button id="prevMonth" class="px-4 py-2 bg-noir-200 text-noir-800 rounded-l-lg hover:bg-noir-300 transition">&lt;</button>
+                    <span id="currentMonthYear" class="px-4 py-2 bg-noir-100 text-noir-800 font-medium"></span>
+                    <button id="nextMonth" class="px-4 py-2 bg-noir-200 text-noir-800 rounded-r-lg hover:bg-noir-300 transition">&gt;</button>
+                </div>
+            </div>
+
+            <!-- Заголовки дней недели -->
+            <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                <div class="text-sm font-medium text-noir-600">Пн</div>
+                <div class="text-sm font-medium text-noir-600">Вт</div>
+                <div class="text-sm font-medium text-noir-600">Ср</div>
+                <div class="text-sm font-medium text-noir-600">Чт</div>
+                <div class="text-sm font-medium text-noir-600">Пт</div>
+                <div class="text-sm font-medium text-noir-600">Сб</div>
+                <div class="text-sm font-medium text-noir-600">Вс</div>
+            </div>
+
+            <!-- Сетка календаря -->
+            <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+
+            <!-- Легенда -->
+            <div class="flex gap-4 mt-4 text-sm">
+                <span class="flex items-center gap-1">
+                    <span class="w-4 h-4 bg-yellow-400 rounded"></span> Занято
+                </span>
+                <span class="flex items-center gap-1">
+                    <span class="w-4 h-4 bg-white border border-noir-300 rounded"></span> Свободно
+                </span>
+            </div>
+        </div>
+
+        <!-- Арендодатель -->
+        <div class="info-card">
+            <h2 class="text-2xl font-bold mb-4 text-noir-800 flex items-center gap-2">
+                <i data-feather="user"></i> Арендодатель
+            </h2>
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-noir-300 rounded-full overflow-hidden flex-shrink-0">
+                    {% if property.owner.avatar %}
+                        <img src="{{ property.owner.avatar.url }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-noir-700 text-white text-2xl font-bold">
+                            {{ property.owner.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <p class="text-lg font-semibold text-noir-800">{{ property.owner.get_full_name|default:property.owner.username }}</p>
+                    <p class="text-noir-500 text-base">{{ property.owner.phone|default:"Телефон не указан" }}</p>
+                    <p class="text-sm text-noir-400 mt-1">На сайте с {{ property.owner.date_joined|date:"d E Y" }}</p>
+                    {% if property.owner.landlord_profile.is_verified %}
+                        <span class="inline-block mt-2 bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">Верифицирован</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const bookedDates = {{ booked_dates|safe }};
+
+    let currentDate = new Date();
+    function updateMonthYear() {
+        const options = { year: 'numeric', month: 'long' };
+        document.getElementById('currentMonthYear').innerText = 
+            new Intl.DateTimeFormat('ru-RU', options).format(currentDate);
+    }
+
+    function renderCalendar(year, month) {
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        let startDayOfWeek = firstDay.getDay();
+        if (startDayOfWeek === 0) startDayOfWeek = 6; else startDayOfWeek -= 1;
+
+        const calendarGrid = document.getElementById('calendarGrid');
+        calendarGrid.innerHTML = '';
+
+        for (let i = 0; i < startDayOfWeek; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'h-10 bg-noir-50 rounded';
+            calendarGrid.appendChild(emptyCell);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const date = new Date(year, month, d);
+            const dateString = date.toISOString().split('T')[0];
+            const cell = document.createElement('div');
+            cell.className = `h-10 flex items-center justify-center rounded text-sm font-medium 
+                ${bookedDates.includes(dateString) 
+                    ? 'bg-yellow-400 text-black' 
+                    : 'bg-white border border-noir-300 text-noir-700 hover:bg-noir-100 transition'}`;
+            cell.textContent = d;
+            calendarGrid.appendChild(cell);
+        }
+    }
+
+    function prevMonth() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        updateMonthYear();
+        renderCalendar(year, month);
+    }
+
+    function nextMonth() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        updateMonthYear();
+        renderCalendar(year, month);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateMonthYear();
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+
+        document.getElementById('prevMonth').addEventListener('click', prevMonth);
+        document.getElementById('nextMonth').addEventListener('click', nextMonth);
+    });
+</script>
+{% endblock %}
