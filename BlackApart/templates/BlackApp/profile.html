@@ -145,9 +145,6 @@
                                 <div><span class="text-noir-500">Телефон:</span> {{ user.phone|default:'не указан' }}</div>
                                 <div><span class="text-noir-500">Регистрация:</span> {{ user.date_joined|date:'d.m.Y' }}</div>
                                 {% if user.tenant_profile %}
-                                <div><span class="text-noir-500">Предпочтения:</span> {{ user.tenant_profile.preferred_property_types }}</div>
-                                <div><span class="text-noir-500">Макс. цена:</span> {{ user.tenant_profile.max_price|default:'—' }}</div>
-                                <div><span class="text-noir-500">Комнат минимум:</span> {{ user.tenant_profile.min_rooms|default:'—' }}</div>
                                 {% endif %}
                             </div>
                             <button onclick="openEditModal()" class="mt-6 px-6 py-3 bg-black-900 text-black rounded-xl hover:bg-black-800 transition flex items-center gap-2">
@@ -420,7 +417,9 @@
                             <div class="flex items-center justify-between mt-4">
                                 <span class="text-sm text-noir-300">👁 {{ prop.views_count }} просмотров</span>
                                 <div class="flex gap-2">
-                                    <a href="{% url 'apartment_detail' prop.id %}" class="border border-white px-4 py-2 rounded-xl text-sm hover:bg-white hover:text-black transition">ОТКРЫТЬ</a>
+                                    {% if prop.moderation_status == 'approved' %}
+                                         <a href="{% url 'apartment_detail' prop.id %}" class="border border-white px-4 py-2 rounded-xl text-sm hover:bg-white hover:text-black transition">ОТКРЫТЬ</a>
+                                    {% endif %}
                                     <a href="{% url 'edit_property' prop.id %}" class="border border-white px-4 py-2 rounded-xl text-sm hover:bg-white hover:text-black transition">РЕДАКТИРОВАТЬ</a>
                                     <form method="post" action="{% url 'delete_property' prop.id %}" onsubmit="return confirm('Удалить объект?');" style="display:inline;">
                                         {% csrf_token %}
@@ -579,13 +578,6 @@
         showSection('personal');
     };
 
-    // Обработчики кнопок переключения ролей (если есть)
-    document.addEventListener('DOMContentLoaded', function() {
-        const tenantBtn = document.getElementById('tenantRoleBtn');
-        const landlordBtn = document.getElementById('landlordRoleBtn');
-        if (tenantBtn) tenantBtn.addEventListener('click', () => setRole('tenant'));
-        if (landlordBtn) landlordBtn.addEventListener('click', () => setRole('landlord'));
-    });
 
     // Функции для модальных окон
     function openEditModal() { document.getElementById('editProfileModal').classList.remove('hidden'); }

@@ -236,7 +236,7 @@ class Property(models.Model):
     has_furniture = models.BooleanField('С мебелью', default=False)
     has_appliances = models.BooleanField('С техникой', default=False)
     allows_pets = models.BooleanField('Можно с животными', default=False)
-    allows_children = models.BooleanField('Можно с детьми', default=True)
+    allows_children = models.BooleanField('Можно с детьми', default=False)
     
     # Данные ЕГРН (SYS-NFR-06)
     egrn_number = models.CharField(

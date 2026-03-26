@@ -95,7 +95,7 @@ class PropertyForm(forms.ModelForm):
             'egrn_number', 'egrn_file'
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
+            'description': forms.Textarea(attrs={'rows': 5}),
         }
 
 class PropertyImageForm(forms.ModelForm):
