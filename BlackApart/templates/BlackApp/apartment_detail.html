@@ -126,7 +126,7 @@
         {% else %}
         <form method="post" action="{% url 'add_to_favorites' property.id %}">
             {% csrf_token %}
-            <button type="submit" class="flex items-center gap-2 px-5 py-3 border-2 border-noir-900 rounded-xl text-base font-medium bg-white text-noir-900 hover:bg-noir-900 hover:text-white transition">
+            <button type="submit" class="flex items-center gap-2 px-5 py-3 border-2 border-noir-900 rounded-xl text-base font-medium bg-black text-white hover:bg-gray-700 hover:text-white transition">
                 <i data-feather="heart" width="20"></i> В избранное
             </button>
         </form>
@@ -208,6 +208,12 @@
                         <i data-feather="users" width="18"></i>
                     </span>
                     <span class="text-noir-700">Дети: {% if property.allows_children %}<span class="text-green-600 font-medium">разрешены</span>{% else %}<span class="text-red-600 font-medium">запрещены</span>{% endif %}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 bg-noir-100 rounded-full flex items-center justify-center text-noir-600">
+                        <i data-feather="droplet" width="18"></i>
+                    </span>
+                    <span class="text-noir-700">Санузел: {% if property.separate_bathroom %}<span class="text-gray-600 font-medium">раздельный</span>{% else %}<span class="text-gray-600 font-medium">совмещённый</span>{% endif %}</span>
                 </div>
             </div>
             {% if property.egrn_file and property.egrn_verified %}
@@ -305,8 +311,8 @@
 {% block extra_scripts %}
 <script>
     const bookedDates = {{ booked_dates|safe }};
-
     let currentDate = new Date();
+
     function updateMonthYear() {
         const options = { year: 'numeric', month: 'long' };
         document.getElementById('currentMonthYear').innerText = 
@@ -317,8 +323,10 @@
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const daysInMonth = lastDay.getDate();
+        
         let startDayOfWeek = firstDay.getDay();
-        if (startDayOfWeek === 0) startDayOfWeek = 6; else startDayOfWeek -= 1;
+        // Преобразуем в понедельник-первый (пн=0, вт=1, ..., вс=6)
+        startDayOfWeek = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1;
 
         const calendarGrid = document.getElementById('calendarGrid');
         calendarGrid.innerHTML = '';
@@ -344,24 +352,19 @@
 
     function prevMonth() {
         currentDate.setMonth(currentDate.getMonth() - 1);
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
         updateMonthYear();
-        renderCalendar(year, month);
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
     }
 
     function nextMonth() {
         currentDate.setMonth(currentDate.getMonth() + 1);
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
         updateMonthYear();
-        renderCalendar(year, month);
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         updateMonthYear();
         renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
-
         document.getElementById('prevMonth').addEventListener('click', prevMonth);
         document.getElementById('nextMonth').addEventListener('click', nextMonth);
     });

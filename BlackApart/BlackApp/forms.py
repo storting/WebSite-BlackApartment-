@@ -91,7 +91,7 @@ class PropertyForm(forms.ModelForm):
         fields = [
             'title', 'description', 'address', 'property_type', 'price',
             'rooms', 'area', 'floor', 'floors_total',
-            'has_furniture', 'has_appliances', 'allows_pets', 'allows_children',
+            'has_furniture', 'has_appliances', 'allows_pets', 'allows_children', 'separate_bathroom',
             'egrn_number', 'egrn_file'
         ]
         widgets = {
