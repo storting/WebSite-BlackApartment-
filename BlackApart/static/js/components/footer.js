@@ -1,5 +1,6 @@
 class CustomFooter extends HTMLElement {
     connectedCallback() {
+      
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.innerHTML = `
         <style>
@@ -83,9 +84,9 @@ class CustomFooter extends HTMLElement {
             </div>
             <div class="footer-section">
               <h3>QUICK LINKS</h3>
-              <p><a href="./apart">Посмотреть объекты</a></p>
-              <p><a href="./log">Войти</a></p>
-              <p><a href="./reg">Зарегистрироваться</a></p>
+              <p><a href="/apartments">Посмотреть объекты</a></p>
+              <p><a href="/login">Войти</a></p>
+              <p><a href="/register/tenant">Зарегистрироваться</a></p>
             </div>
   </div>
           <div class="copyright">
@@ -93,6 +94,9 @@ class CustomFooter extends HTMLElement {
           </div>
         </footer>
       `;
+      if (typeof feather !== 'undefined') {
+              feather.replace(this.shadowRoot);
+      }
     }
   }
   customElements.define('custom-footer', CustomFooter);

@@ -330,11 +330,10 @@
         }
 
         for (let d = 1; d <= daysInMonth; d++) {
-            const date = new Date(year, month, d);
-            const dateString = date.toISOString().split('T')[0];
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             const cell = document.createElement('div');
             cell.className = `h-10 flex items-center justify-center rounded text-sm font-medium 
-                ${bookedDates.includes(dateString) 
+                ${bookedDates.includes(dateStr) 
                     ? 'bg-yellow-400 text-black' 
                     : 'bg-white border border-noir-300 text-noir-700 hover:bg-noir-100 transition'}`;
             cell.textContent = d;

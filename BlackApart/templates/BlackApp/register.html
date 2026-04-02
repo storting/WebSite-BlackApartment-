@@ -22,7 +22,7 @@
                 <h1 class="text-5xl font-bold text-center mb-12 text-noir-900">РЕГИСТРАЦИЯ</h1>
                 <div class="bg-white p-8 border border-noir-200 rounded-lg shadow-lg">
                     <div class="mb-8">
-                        <h2 class="text-2xl font-bold mb-6 text-center text-noir-900">А КАКУЮ ЮСТОРОНУ ПРИМЕШЬ ТЫ?</h2>
+                        <h2 class="text-2xl font-bold mb-6 text-center text-noir-900">А КАКУЮ СТОРОНУ ПРИМЕШЬ ТЫ?</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <button type="button" id="tenantBtn" class="w-full bg-noir-900 text-white px-6 py-4 font-medium hover:bg-noir-800 transition-all duration-300 rounded-lg border-2 border-noir-900">
                                 <div class="text-center text-black">
@@ -120,6 +120,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Дата рождения *</label>
+                            <input type="date" id="landlord_dob" name="birth_date" class="form-control" required>
                             {{ form.birth_date|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
                             {% if form.birth_date.errors %}<div class="text-red-600 text-sm">{{ form.birth_date.errors }}</div>{% endif %}
                         </div>
