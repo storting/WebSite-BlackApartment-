@@ -1,0 +1,596 @@
+{% extends 'BlackApp/base.html' %}
+{% load static %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Кастомные стили для статусов и анимаций */
+    .status-new { background-color: #3b82f6; color: white; }
+    .status-confirmed { background-color: #10b981; color: white; }
+    .status-completed { background-color: #6b7280; color: white; }
+    .status-cancelled { background-color: #ef4444; color: white; }
+    .status-draft { background-color: #6b7280; color: white; }
+    .status-pending { background-color: #f59e0b; color: white; }
+    .status-approved { background-color: #10b981; color: white; }
+    .status-rejected { background-color: #ef4444; color: white; }
+    .status-verified { background-color: #10b981; color: white; }
+    
+    button, a, .menu-item, .status-tag {
+        transition: all 0.2s ease;
+    }
+    
+    .modal-overlay {
+        background-color: rgba(0,0,0,0.7);
+        backdrop-filter: blur(3px);
+    }
+    .modal-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        position: relative;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    .menu-item.active {
+        background-color: black;
+        color: white;
+    }
+    .menu-item:not(.active) {
+        background-color: #f3f4f6;
+        color: #1f2937;
+    }
+    .menu-item:not(.active):hover {
+        background-color: #e5e7eb;
+    }
+    .property-card {
+        background-color: #111827;
+        color: white;
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+    .property-card:hover {
+        transform: scale(1.02);
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    .animate-slide-up {
+        animation: slideUp 0.4s ease-out;
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    @keyframes slideUp {
+        0% { transform: translateY(20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero с Vanta.js (занимает 40vh) -->
+<section id="hero" class="relative h-[40vh] min-h-[300px] flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-60 z-10"></div>
+    <div class="relative z-20 text-center text-white px-4">
+        <h1 class="text-5xl md:text-6xl font-bold mb-4 tracking-tight animate-fade-in">ПРОФИЛЬ</h1>
+        <p class="text-xl text-noir-200 font-light animate-slide-up" id="heroSubtitle">
+            {% if user.is_authenticated %}
+                {{ user.get_full_name|default:user.username }} · 
+                {% if user.user_type == 'tenant' %}Арендатор{% elif user.user_type == 'landlord' %}Арендодатель{% else %}Пользователь{% endif %}
+            {% else %}
+                Войдите для просмотра
+            {% endif %}
+        </p>
+    </div>
+</section>
+
+<!-- Основной контент -->
+<main class="container mx-auto px-4 -mt-20 pb-12 max-w-6xl relative z-30">
+    <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 animate-slide-up">
+        <!-- Шапка профиля с аватаром -->
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 pb-6 border-b border-noir-200">
+            <div class="relative">
+                <div class="w-24 h-24 rounded-full bg-noir-300 overflow-hidden border-2 border-black cursor-pointer hover:opacity-80 transition" onclick="document.getElementById('avatarInput').click()">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" alt="avatar" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-noir-700 text-white text-3xl font-bold">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                <form id="avatarForm" method="post" enctype="multipart/form-data" action="{% url 'upload_avatar' %}" style="display:none;">
+                    {% csrf_token %}
+                    <input type="file" name="avatar" id="avatarInput" accept="image/*" onchange="this.form.submit()">
+                </form>
+            </div>
+            <div class="text-center md:text-left">
+                <h2 class="text-3xl font-bold text-noir-900">{{ user.get_full_name|default:user.username }}</h2>
+                <p class="text-noir-500 mt-1">{{ user.email }} · {{ user.phone|default:'телефон не указан' }}</p>
+                <p class="text-sm text-noir-400 mt-1">Зарегистрирован: {{ user.date_joined|date:'d E Y' }}</p>
+                {% if user.user_type == 'landlord' and user.landlord_profile %}
+                <div class="landlord-only mt-2 flex items-center gap-4 text-sm">
+                    <span class="flex items-center gap-1"><span class="font-bold">{{ user.landlord_profile.rating|floatformat:1 }}</span> ★ ({{ user.landlord_profile.reviews_count }})</span>
+                    <span>Баланс: {{ user.landlord_profile.balance }} ₽</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Боковое меню -->
+            <div class="lg:w-1/4">
+                <div class="bg-noir-50 p-4 rounded-2xl" id="sidebarContainer">
+                    <nav class="space-y-2" id="menu">
+                        <!-- Меню будет заполнено скриптом в зависимости от роли -->
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Контентная область – все секции для разных ролей -->
+            <div class="flex-1 min-w-0">
+                <!-- Секции для арендатора -->
+                {% if user.user_type == 'tenant' %}
+                    <!-- Личная информация -->
+                    <div id="personal" class="section">
+                        <div class="bg-white border border-noir-200 rounded-2xl p-6">
+                            <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-feather="user"></i> ЛИЧНАЯ ИНФОРМАЦИЯ</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><span class="text-noir-500">Имя:</span> {{ user.first_name }} {{ user.last_name }}</div>
+                                <div><span class="text-noir-500">Email:</span> {{ user.email }}</div>
+                                <div><span class="text-noir-500">Телефон:</span> {{ user.phone|default:'не указан' }}</div>
+                                <div><span class="text-noir-500">Регистрация:</span> {{ user.date_joined|date:'d.m.Y' }}</div>
+                                {% if user.tenant_profile %}
+                                {% endif %}
+                            </div>
+                            <button onclick="openEditModal()" class="mt-6 px-6 py-3 bg-black-900 text-black rounded-xl hover:bg-black-800 transition flex items-center gap-2">
+                                <i data-feather="edit-2" width="16"></i> РЕДАКТИРОВАТЬ
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Избранное -->
+                    <div id="favorites" class="section hidden">
+                        <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-feather="heart"></i> ИЗБРАННОЕ</h2>
+                        {% if favorites %}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {% for fav in favorites %}
+                                <div class="property-card group">
+                                    <div class="h-40 bg-noir-800 overflow-hidden">
+                                        {% if fav.property.images.all %}
+                                            <img src="{{ fav.property.images.first.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition">
+                                        {% else %}
+                                            <div class="w-full h-full flex items-center justify-center text-white">Нет фото</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="p-4">
+                                        <h3 class="font-bold mb-1">{{ fav.property.address }}</h3>
+                                        <p class="text-noir-300 text-sm mb-3">{{ fav.property.price }} ₽/сут</p>
+                                        <div class="flex gap-2">
+                                            <form method="post" action="{% url 'apartment_detail' fav.property.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="flex items-center gap-1 text-sm border border-white px-3 py-1 rounded-xl hover:bg-white hover:text-black transition">
+                                                    <i data-feather="search" width="14"></i> ОТКРЫТЬ
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{% url 'remove_from_favorites' fav.property.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="flex items-center gap-1 text-sm border border-white px-3 py-1 rounded-xl hover:bg-white hover:text-black transition">
+                                                    <i data-feather="trash-2" width="14"></i> УДАЛИТЬ
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-noir-500">У вас пока нет избранных объектов.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Мои бронирования -->
+                    <div id="bookings" class="section hidden">
+                        <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-feather="calendar"></i> МОИ БРОНИРОВАНИЯ</h2>
+                        {% if bookings %}
+                            <div class="space-y-4">
+                                {% for booking in bookings %}
+                                <div class="border border-noir-200 rounded-2xl p-5">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-bold">{{ booking.property.address }}</span>
+                                        <span class="status-tag status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                                    </div>
+                                    <p class="text-sm text-noir-600 mb-1">{{ booking.start_date|date:"d.m.Y" }} - {{ booking.end_date|date:"d.m.Y" }}</p>
+                                    {% if booking.message %}
+                                        <p class="text-sm text-noir-600 mb-2">Сообщение: {{ booking.message }}</p>
+                                    {% endif %}
+                                    {% if booking.status == 'pending' %}
+                                        <form method="post" action="{% url 'cancel_booking' booking.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="text-sm border border-red-600 text-red-600 px-4 py-2 rounded-xl hover:bg-red-600 hover:text-white transition">ОТМЕНИТЬ</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if booking.status == 'confirmed' %}
+                                        <form method="post" action="{% url 'cancel_booking' booking.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="text-sm border border-red-600 text-red-600 px-4 py-2 rounded-xl hover:bg-red-600 hover:text-white transition">ОТМЕНИТЬ</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if booking.status == 'cancelled' or booking.status == 'completed' %}
+                                        <form method="post" action="{% url 'delete_booking' booking.id %}" onsubmit="return confirm('Удалить бронь?');" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="text-sm border border-noir-500 text-noir-700 px-4 py-2 rounded-xl hover:bg-black hover:text-white transition">
+                                                <div class="flex"><i data-feather="trash-2" width="20"></i>УДАЛИТЬ</div>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-noir-500">У вас пока нет бронирований.</p>
+                        {% endif %}
+                    </div>
+
+                <!-- Секции для арендодателя -->
+                {% elif user.user_type == 'landlord' %}
+                    <!-- Личная информация -->
+                    <div id="personal" class="section">
+                        <div class="bg-white border border-noir-200 rounded-2xl p-6">
+                            <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-feather="user"></i> ЛИЧНАЯ ИНФОРМАЦИЯ</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><span class="text-noir-500">Имя:</span> {{ user.first_name }} {{ user.last_name }}</div>
+                                <div><span class="text-noir-500">Email:</span> {{ user.email }}</div>
+                                <div><span class="text-noir-500">Телефон:</span> {{ user.phone|default:'не указан' }}</div>
+                                <div><span class="text-noir-500">Дата рождения:</span> {{ user.birth_date|default:'не указана' }}</div>
+                                <div><span class="text-noir-500">Верификация:</span> 
+                                    {% if user.landlord_profile.is_verified %}
+                                        <span class="status-tag status-verified">ВЕРИФИЦИРОВАН</span>
+                                    {% else %}
+                                        <span class="status-tag status-pending">НА ПРОВЕРКЕ</span>
+                                    {% endif %}
+                                </div>
+                                <div><span class="text-noir-500">Рейтинг:</span> {{ user.landlord_profile.rating|floatformat:1 }} ★ ({{ user.landlord_profile.reviews_count }})</div>
+                                <div><span class="text-noir-500">Баланс:</span> {{ user.landlord_profile.balance }} ₽</div>
+                            </div>
+                            <button onclick="openEditModal()" class="mt-6 px-6 py-3 bg-noir-900 text-black rounded-xl hover:bg-noir-800 transition flex items-center gap-2">
+                                <i data-feather="edit-2" width="16"></i> РЕДАКТИРОВАТЬ
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Входящие бронирования -->
+                    <div id="incoming" class="section hidden">
+                        <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-feather="inbox"></i> ЗАПРОСЫ НА БРОНИРОВАНИЕ</h2>
+                        {% if incoming_bookings %}
+                            <div class="space-y-4">
+                                {% for booking in incoming_bookings %}
+                                <div class="border border-noir-200 rounded-2xl p-5">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-bold">{{ booking.property.address }}</span>
+                                        <span class="status-tag status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                                    </div>
+                                    <p class="text-sm mb-2">Арендатор: {{ booking.tenant.get_full_name|default:booking.tenant.username }}, {{ booking.tenant.phone }}</p>
+                                    <p class="text-sm mb-2">{{ booking.start_date|date:"d.m.Y" }} - {{ booking.end_date|date:"d.m.Y" }}</p>
+                                    {% if booking.message %}
+                                        <p class="text-sm mb-3">Сообщение: {{ booking.message }}</p>
+                                    {% endif %}
+                                    {% if booking.status == 'pending' %}
+                                        <div class="flex gap-3">
+                                            <form method="post" action="{% url 'confirm_booking' booking.id %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition">ПОДТВЕРДИТЬ</button>
+                                            </form>
+                                            <form method="post" action="{% url 'reject_booking' booking.id %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition">ОТКЛОНИТЬ</button>
+                                            </form>
+                                        </div>
+                                    {% elif booking.status == 'confirmed' %}
+                                        <form method="post" action="{% url 'complete_booking' booking.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-800 transition">ЗАВЕРШЕНО</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if booking.status == 'cancelled' or booking.status == 'completed' %}
+                                        <form method="post" action="{% url 'delete_booking' booking.id %}" onsubmit="return confirm('Удалить бронь?');" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="px-4 py-2 border border-noir-500 text-noir-700 rounded-xl hover:bg-noir-700 hover:text-white transition">УДАЛИТЬ</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-noir-500">Нет входящих запросов.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Отзывы -->
+                    <div id="reviews" class="section hidden">
+                        <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-feather="star"></i> ОТЗЫВЫ</h2>
+                        {% if reviews %}
+                            <div class="space-y-4">
+                                {% for review in reviews %}
+                                <div class="border border-noir-200 rounded-2xl p-5">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-10 h-10 bg-noir-300 rounded-full overflow-hidden">
+                                            {% if review.author.avatar %}
+                                                <img src="{{ review.author.avatar.url }}" class="w-full h-full object-cover">
+                                            {% else %}
+                                                <div class="w-full h-full flex items-center justify-center bg-noir-700 text-white text-sm">
+                                                    {{ review.author.username|first|upper }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <span class="font-bold">{{ review.author.get_full_name|default:review.author.username }}</span>
+                                            <span class="text-sm text-noir-500 ml-2">про «{{ review.property.address }}»</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1 mb-2">
+                                        <span class="text-yellow-400">{{ review.rating|floatformat:0 }}★</span>
+                                        <span class="text-sm text-noir-500 ml-2">{{ review.created_at|date:'d.m.Y' }}</span>
+                                    </div>
+                                    <p class="text-sm mb-3">{{ review.text }}</p>
+                                    <button class="text-sm border-b border-noir-900 pb-0.5 hover:text-noir-500">ОТВЕТИТЬ</button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-noir-500">Пока нет отзывов.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Документы -->
+                    <div id="documents" class="section hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold flex items-center gap-2"><i data-feather="file"></i> ДОКУМЕНТЫ</h2>
+                            <button onclick="openDocModal()" class="px-6 py-3 bg-noir-900 text-black rounded-xl hover:bg-noir-800 transition flex items-center gap-2">
+                                <i data-feather="upload" width="16"></i> ЗАГРУЗИТЬ
+                            </button>
+                        </div>
+                        {% if documents %}
+                            <div class="border border-noir-200 rounded-2xl divide-y divide-noir-200">
+                                {% for doc in documents %}
+                                <div class="p-5 flex justify-between items-center">
+                                    <div>
+                                        <p class="font-medium">{{ doc.get_doc_type_display }}</p>
+                                        <p class="text-xs text-noir-500">загружен {{ doc.uploaded_at|date:'d.m.Y' }}</p>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <span class="status-tag 
+                                            {% if doc.is_verified %}status-approved
+                                            {% elif doc.is_verified is False and doc.verified_by %}status-rejected
+                                            {% else %}status-pending{% endif %}">
+                                            {% if doc.is_verified %}ПРОВЕРЕН
+                                            {% elif doc.is_verified is False and doc.verified_by %}ОТКЛОНЁН
+                                            {% else %}НА ПРОВЕРКЕ{% endif %}
+                                        </span>
+                                        <a href="{{ doc.file.url }}" download class="text-noir-700 hover:text-noir-900">
+                                            <i data-feather="download" width="18"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-noir-500">Документы не загружены.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Блок "Мои объекты" для арендодателя (всегда виден внизу) -->
+        {% if user.user_type == 'landlord' %}
+        <div id="landlordPropertiesBlock" class="mt-10">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                <i data-feather="home"></i> МОИ ОБЪЕКТЫ
+                <a href="{% url 'add_property' %}" class="ml-auto px-6 py-2 bg-noir-900 text-white rounded-xl hover:bg-noir-800 transition text-sm flex items-center gap-2">
+                    <i data-feather="plus" width="16"></i> ДОБАВИТЬ
+                </a>
+            </h2>
+            <div class="space-y-4">
+                {% for prop in properties %}
+                <div class="property-card group">
+                    <div class="flex flex-col sm:flex-row">
+                        <div class="sm:w-48 bg-noir-800 overflow-hidden rounded-lg aspect-square">
+                            {% if prop.images.all %}
+                                 <img src="{{ prop.images.first.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition">
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center text-white">Нет фото</div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 p-5">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg">{{ prop.title }}</h3>
+                                    <p class="text-noir-300 text-sm">{{ prop.address }} · {{ prop.price }} ₽/сут</p>
+                                </div>
+                                <span class="status-tag status-{{ prop.moderation_status }}">{{ prop.get_moderation_status_display }}</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-4">
+                                <span class="text-sm text-noir-300">👁 {{ prop.views_count }} просмотров</span>
+                                <div class="flex gap-2">
+                                    {% if prop.moderation_status == 'approved' %}
+                                         <a href="{% url 'apartment_detail' prop.id %}" class="border border-white px-4 py-2 rounded-xl text-sm hover:bg-white hover:text-black transition">ОТКРЫТЬ</a>
+                                    {% endif %}
+                                    <a href="{% url 'edit_property' prop.id %}" class="border border-white px-4 py-2 rounded-xl text-sm hover:bg-white hover:text-black transition">РЕДАКТИРОВАТЬ</a>
+                                    <form method="post" action="{% url 'delete_property' prop.id %}" onsubmit="return confirm('Удалить объект?');" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="border border-white px-4 py-2 rounded-xl text-sm hover:bg-white hover:text-black transition">УДАЛИТЬ</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-noir-500">У вас пока нет объектов. <a href="{% url 'add_property' %}" class="underline">Добавить</a></p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+
+<!-- Модальные окна -->
+<div id="editProfileModal" class="fixed inset-0 flex items-center justify-center z-50 hidden modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-card">
+        <h3 class="text-xl font-bold mb-6">РЕДАКТИРОВАТЬ ПРОФИЛЬ</h3>
+        <form method="post" action="{% url 'edit_profile' %}">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Имя</label>
+                    <input type="text" name="first_name" value="{{ user.first_name }}" class="w-full border border-noir-300 rounded-xl px-4 py-3 focus:border-noir-900 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Фамилия</label>
+                    <input type="text" name="last_name" value="{{ user.last_name }}" class="w-full border border-noir-300 rounded-xl px-4 py-3 focus:border-noir-900 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Email</label>
+                    <input type="email" name="email" value="{{ user.email }}" class="w-full border border-noir-300 rounded-xl px-4 py-3 focus:border-noir-900 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Телефон</label>
+                    <input type="tel" name="phone" value="{{ user.phone }}" class="w-full border border-noir-300 rounded-xl px-4 py-3 focus:border-noir-900 outline-none">
+                </div>
+                {% if user.user_type == 'landlord' %}
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Дата рождения</label>
+                    <input type="date" name="birth_date" value="{{ user.birth_date|date:'Y-m-d' }}" class="w-full border border-noir-300 rounded-xl px-4 py-3 focus:border-noir-900 outline-none">
+                </div>
+                {% endif %}
+            </div>
+            <div class="mt-6 flex justify-center gap-3">
+                <button type="button" onclick="closeModal()" class="px-6 py-3 border-2 border-noir-900 text-noir-900 font-medium rounded-xl hover:bg-black-900 hover:text-black transition">ОТМЕНА</button>
+                <button type="submit" class="px-6 py-3 bg-black text-white font-medium rounded-xl hover:bg-noir-800 transition">СОХРАНИТЬ</button>
+            </div>
+        </form>
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-noir-400 hover:text-noir-900"><i data-feather="x" width="20"></i></button>
+    </div>
+</div>
+
+<div id="uploadDocumentModal" class="fixed inset-0 flex items-center justify-center z-50 hidden modal-overlay" onclick="if(event.target===this) closeDocModal()">
+    <div class="modal-card">
+        <h3 class="text-xl font-bold mb-6">ЗАГРУЗИТЬ ДОКУМЕНТ</h3>
+        <form method="post" enctype="multipart/form-data" action="{% url 'upload_document' %}">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Тип документа</label>
+                    <select name="doc_type" class="w-full border border-noir-300 rounded-xl px-4 py-3 focus:border-noir-900 outline-none">
+                        <option value="passport">Паспорт</option>
+                        <option value="ownership">Свидетельство о собственности</option>
+                        <option value="contract">Договор</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Файл</label>
+                    <input type="file" name="file" class="w-full border border-noir-300 rounded-xl px-4 py-2 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-noir-900 file:text-white hover:file:bg-noir-700">
+                </div>
+            </div>
+            <div class="mt-6 flex justify-center gap-3">
+                <button type="button" onclick="closeDocModal()" class="px-6 py-3 border-2 border-noir-900 text-noir-900 font-medium rounded-xl hover:bg-noir-900 hover:text-black transition">ОТМЕНА</button>
+                <button type="submit" class="px-6 py-3 border-2 border-noir-900 text-white font-medium rounded-xl bg-black hover:bg-black hover:text-white transition">ЗАГРУЗИТЬ</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Переменные для переключения вкладок
+    let currentRole = '{{ user.user_type }}';
+    let activeSection = 'personal';
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+        document.getElementById(sectionId).classList.remove('hidden');
+        activeSection = sectionId;
+        // Обновляем активный пункт меню
+        document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.menu-item[data-section="${sectionId}"]`).classList.add('active');
+    }
+
+    function renderMenu() {
+        let menuHtml = '';
+        if (currentRole === 'tenant') {
+            menuHtml = `
+                <button onclick="showSection('personal')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'personal' ? 'active' : ''}" data-section="personal">
+                    <i data-feather="user" width="18"></i> ЛИЧНАЯ ИНФОРМАЦИЯ
+                </button>
+                <button onclick="showSection('favorites')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'favorites' ? 'active' : ''}" data-section="favorites">
+                    <i data-feather="heart" width="18"></i> ИЗБРАННОЕ
+                </button>
+                <button onclick="showSection('bookings')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'bookings' ? 'active' : ''}" data-section="bookings">
+                    <i data-feather="calendar" width="18"></i> МОИ БРОНИРОВАНИЯ
+                </button>
+            `;
+        } else if (currentRole === 'landlord') {
+            menuHtml = `
+                <button onclick="showSection('personal')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'personal' ? 'active' : ''}" data-section="personal">
+                    <i data-feather="user" width="18"></i> ЛИЧНАЯ ИНФОРМАЦИЯ
+                </button>
+                <button onclick="showSection('incoming')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'incoming' ? 'active' : ''}" data-section="incoming">
+                    <i data-feather="inbox" width="18"></i> ЗАПРОСЫ НА БРОНИРОВАНИЕ
+                </button>
+                <button onclick="showSection('reviews')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'reviews' ? 'active' : ''}" data-section="reviews">
+                    <i data-feather="star" width="18"></i> ОТЗЫВЫ
+                </button>
+                <button onclick="showSection('documents')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'documents' ? 'active' : ''}" data-section="documents">
+                    <i data-feather="file" width="18"></i> ДОКУМЕНТЫ
+                </button>
+            `;
+        }
+        document.getElementById('menu').innerHTML = menuHtml;
+        feather.replace();
+    }
+
+    // Инициализация Vanta
+    window.onload = function() {
+        if (typeof VANTA !== 'undefined') {
+            VANTA.NET({
+                el: "#hero",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                color: 0xffffff,
+                backgroundColor: 0x000000,
+                points: 12.00,
+                maxDistance: 25.00,
+                spacing: 18.00
+            });
+        }
+        renderMenu();
+        showSection('personal');
+    };
+
+
+    // Функции для модальных окон
+    function openEditModal() { document.getElementById('editProfileModal').classList.remove('hidden'); }
+    function closeModal() { document.getElementById('editProfileModal').classList.add('hidden'); }
+    function openDocModal() { document.getElementById('uploadDocumentModal').classList.remove('hidden'); }
+    function closeDocModal() { document.getElementById('uploadDocumentModal').classList.add('hidden'); }
+
+    // Закрытие по Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+            closeDocModal();
+        }
+    });
+</script>
+{% endblock %}

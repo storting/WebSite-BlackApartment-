@@ -1,0 +1,120 @@
+{% extends 'BlackApp/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Редактировать объект{% endblock %}
+
+{% block content %}
+<div class="pt-24 container mx-auto px-4 max-w-3xl">
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h1 class="text-3xl font-bold mb-6">Редактирование объекта</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Основные поля формы (выводим с помощью django-widget-tweaks для стилизации) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Название</label>
+                    {{ form.title|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Тип</label>
+                    {{ form.property_type|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Адрес</label>
+                    {{ form.address|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Описание</label>
+                    {{ form.description|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2 h-32" }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Цена (₽/сут)</label>
+                    {{ form.price|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Комнат</label>
+                    {{ form.rooms|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Площадь (м²)</label>
+                    {{ form.area|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Этаж</label>
+                    {{ form.floor|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Всего этажей</label>
+                    {{ form.floors_total|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Номер ЕГРН</label>
+                    {{ form.egrn_number|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-noir-700 mb-1">Файл ЕГРН</label>
+                    {{ form.egrn_file|add_class:"w-full border border-noir-300 rounded-lg px-4 py-2" }}
+                    {% if property.egrn_file %}
+                        <p class="text-sm text-noir-500 mt-1">Текущий файл: <a href="{{ property.egrn_file.url }}" target="_blank" class="underline">скачать</a></p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Дополнительные удобства (чекбоксы) -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold mb-3">Удобства</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <label class="flex items-center gap-2">
+                        {{ form.has_furniture }} С мебелью
+                    </label>
+                    <label class="flex items-center gap-2">
+                        {{ form.has_appliances }} С техникой
+                    </label>
+                    <label class="flex items-center gap-2">
+                        {{ form.allows_pets }} Животные разрешены
+                    </label>
+                    <label class="flex items-center gap-2">
+                        {{ form.allows_children }} Дети разрешены
+                    </label>
+                </div>
+            </div>
+
+            <!-- Управление фотографиями -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold mb-3">Фотографии</h3>
+                {% if property.images.all %}
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    {% for img in property.images.all %}
+                    <div class="relative border rounded-lg p-2">
+                        <img src="{{ img.image.url }}" class="w-full h-32 object-cover rounded-lg mb-2">
+                        <div class="flex items-center gap-2 text-sm">
+                            <label>
+                                <input type="radio" name="main_image" value="{{ img.id }}" {% if img.is_main %}checked{% endif %}>
+                                Главная
+                            </label>
+                            <label class="ml-auto">
+                                <input type="checkbox" name="delete_images" value="{{ img.id }}">
+                                Удалить
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <label class="block text-sm font-medium text-noir-700 mb-2">Добавить новые фото</label>
+                <input type="file" name="new_images" multiple accept="image/*" class="w-full border border-noir-300 rounded-lg px-4 py-2">
+                <p class="text-xs text-noir-500 mt-1">Можно выбрать несколько файлов</p>
+            </div>
+
+            <!-- Кнопки -->
+            <div class="mt-8 flex justify-center gap-4">
+                <a href="{% url 'profile' %}" class="px-6 py-3 border-2 border-noir-900 text-noir-900 rounded-xl hover:bg-noir-900 hover:text-white transition">Отмена</a>
+                <button type="submit" class="px-6 py-3 bg-black text-white rounded-xl hover:bg-black transition">Сохранить изменения</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

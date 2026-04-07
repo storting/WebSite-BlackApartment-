@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #000000;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #333333;
+}
+
+/* Smooth transitions for all interactive elements */
+a, button {
+    transition: all 0.3s ease;
+}
+
+/* Loading animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+/* Minimalist focus styles */
+button:focus, a:focus {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+}
+
+/* Custom filter section styles */
+.filter-section {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.filter-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.filter-select option {
+    background: #000000;
+    color: white;
+}
+/* Image hover effects */
+.property-image {
+    transition: transform 0.5s ease;
+}
+
+.property-image:hover {
+    transform: scale(1.05);
+}
+
+/* Custom gradient backgrounds */
+.gradient-dark {
+    background: linear-gradient(135deg, #000000 0%, #333333 100%);
+}
+
+.gradient-light {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+/* ===== Календарь ===== */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-cell {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: default;
+}
+
+.calendar-cell.available {
+    background-color: white;
+    border: 1px solid #dee2e6;
+    color: #495057;
+}
+
+.calendar-cell.available:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.02);
+}
+
+.calendar-cell.booked {
+    background-color: #fbbf24; /* жёлтый */
+    color: black;
+    border: 1px solid #f59e0b;
+}
+
+.calendar-cell.today {
+    border: 2px solid black;
+    font-weight: bold;
+}
+
+.calendar-weekday {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-bottom: 4px;
+}
+
+/* ===== Чекбоксы и радио ===== */
+/* Скрываем стандартный чекбокс */
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ced4da;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+input[type="checkbox"]:checked {
+    background-color: black;
+    border-color: black;
+}
+
+input[type="checkbox"]:checked::after {
+    content: "✓";
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+input[type="checkbox"]:hover {
+    border-color: black;
+}
+
+/* Радиокнопки */
+input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ced4da;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+input[type="radio"]:checked {
+    border-color: black;
+}
+
+input[type="radio"]:checked::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+input[type="radio"]:hover {
+    border-color: black;
+}
+
+/* Метки для чекбоксов и радио */
+label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #495057;
+}
+
+/* ===== Кнопки навигации календаря ===== */
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.calendar-nav button {
+    background-color: #e9ecef;
+    border: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+}
+
+.calendar-nav button:hover {
+    background-color: #dee2e6;
+}
+
+.calendar-nav span {
+    font-weight: 600;
+    color: #212529;
+    min-width: 140px;
+    text-align: center;
+}

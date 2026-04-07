@@ -1,0 +1,58 @@
+{% extends 'BlackApp/base.html' %}
+{% load static %}
+
+{% block title %}Квартиры в Новосибирске{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-center mb-8">Наши квартиры</h1>
+    
+    <!-- Форма фильтрации -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <input type="text" name="q" placeholder="Поиск по адресу" value="{{ request.GET.q }}" class="border rounded-lg px-4 py-2">
+            
+            <select name="type" class="border rounded-lg px-4 py-2">
+                <option value="">Все типы</option>
+                {% for code, name in property_types %}
+                <option value="{{ code }}" {% if request.GET.type == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="number" name="min_price" placeholder="Цена от" value="{{ request.GET.min_price }}" class="border rounded-lg px-4 py-2">
+            <input type="number" name="max_price" placeholder="Цена до" value="{{ request.GET.max_price }}" class="border rounded-lg px-4 py-2">
+            
+            <input type="number" name="rooms" placeholder="Комнат" value="{{ request.GET.rooms }}" class="border rounded-lg px-4 py-2">
+            
+            <button type="submit" class="md:col-span-1 bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition">Применить</button>
+        </form>
+    </div>
+    
+    <!-- Список объектов -->
+    {% if properties %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for prop in properties %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden transform transition hover:scale-105">
+            <div class="h-48 overflow-hidden">
+                {% if prop.images.all %}
+                <img src="{{ prop.images.first.image.url }}" alt="{{ prop.title }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600">Нет фото</div>
+                {% endif %}
+            </div>
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2">{{ prop.title }}</h3>
+                <p class="text-gray-600 mb-4">{{ prop.address }}</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-2xl font-bold">{{ prop.price }} ₽/сут</span>
+                    <a href="{% url 'apartment_detail' prop.id %}" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center text-gray-500 py-12">Квартиры не найдены</p>
+    {% endif %}
+</div>
+{% endblock %}
