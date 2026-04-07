@@ -69,9 +69,14 @@ def profile(request):
     context = {'user': user}
 
     if user.user_type == 'tenant':
-        context['bookings'] = Booking.objects.filter(tenant=user).select_related('property')
+        # Добавляем избранное
+        favorites = Favorite.objects.filter(user=user).select_related('property')
+        bookings = Booking.objects.filter(tenant=user).select_related('property')
+        context.update({
+            'favorites': favorites,
+            'bookings': bookings,
+        })
     elif user.user_type == 'landlord':
-        context['incoming_bookings'] = Booking.objects.filter(property__owner=user).select_related('tenant', 'property')
         properties = Property.objects.filter(owner=user)  
         incoming_bookings = Booking.objects.filter(property__owner=user).select_related('tenant', 'property')
         reviews = Review.objects.filter(landlord=user).select_related('author', 'property')
@@ -97,19 +102,19 @@ def upload_avatar(request):
 def add_to_favorites(request, property_id):
     if request.user.user_type != 'tenant':
         messages.error(request, 'Только арендаторы могут добавлять в избранное')
-        return redirect('apartment_detail', id=property_id)
+        return redirect(request.META.get('HTTP_REFERER', 'profile'))
     
     property_obj = get_object_or_404(Property, id=property_id)
     Favorite.objects.get_or_create(user=request.user, property=property_obj)
     messages.success(request, 'Объект добавлен в избранное')
-    return redirect('apartment_detail', id=property_id)
+    return redirect(request.META.get('HTTP_REFERER', 'profile'))
 
 @login_required
 def remove_from_favorites(request, property_id):
     favorite = get_object_or_404(Favorite, user=request.user, property_id=property_id)
     favorite.delete()
     messages.success(request, 'Объект удалён из избранного')
-    return redirect('apartment_detail', id=property_id)
+    return redirect(request.META.get('HTTP_REFERER', 'profile'))
 
 @login_required
 def edit_profile(request):

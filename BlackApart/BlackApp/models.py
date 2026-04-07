@@ -235,6 +235,7 @@ class Property(models.Model):
     floors_total = models.PositiveSmallIntegerField('Этажей в доме', null=True, blank=True)
     has_furniture = models.BooleanField('С мебелью', default=False)
     has_appliances = models.BooleanField('С техникой', default=False)
+    separate_bathroom = models.BooleanField('Раздельный санулзел', default=False)
     allows_pets = models.BooleanField('Можно с животными', default=False)
     allows_children = models.BooleanField('Можно с детьми', default=False)
     
@@ -288,8 +289,6 @@ class Property(models.Model):
             models.Index(fields=['moderation_status', 'published_at']),
             models.Index(fields=['property_type', 'price']),
             models.Index(fields=['rooms', 'area']),
-            # Индекс для полнотекстового поиска (если используем PostgreSQL)
-            # models.Index(fields=['address'], name='property_address_gin', opclasses=['gin_trgm_ops']),
         ]
     
     def __str__(self):
@@ -466,6 +465,7 @@ class Booking(models.Model):
         related_name='bookings',
         limit_choices_to={'user_type': 'tenant'}
     )
+    
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='bookings')
     start_date = models.DateField('Дата заезда')
     end_date = models.DateField('Дата выезда')
