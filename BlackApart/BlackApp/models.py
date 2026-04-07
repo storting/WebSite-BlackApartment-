@@ -466,6 +466,7 @@ class Booking(models.Model):
         related_name='bookings',
         limit_choices_to={'user_type': 'tenant'}
     )
+    
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='bookings')
     start_date = models.DateField('Дата заезда')
     end_date = models.DateField('Дата выезда')
