@@ -511,6 +511,7 @@
     // Переменные для переключения вкладок
     let currentRole = '{{ user.user_type }}';
     let activeSection = 'personal';
+    const addPropertyUrl = "{% url 'add_property' %}";
 
     function showSection(sectionId) {
         document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
@@ -536,21 +537,25 @@
                 </button>
             `;
         } else if (currentRole === 'landlord') {
-            menuHtml = `
-                <button onclick="showSection('personal')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'personal' ? 'active' : ''}" data-section="personal">
-                    <i data-feather="user" width="18"></i> ЛИЧНАЯ ИНФОРМАЦИЯ
-                </button>
-                <button onclick="showSection('incoming')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'incoming' ? 'active' : ''}" data-section="incoming">
-                    <i data-feather="inbox" width="18"></i> ЗАПРОСЫ НА БРОНИРОВАНИЕ
-                </button>
-                <button onclick="showSection('reviews')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'reviews' ? 'active' : ''}" data-section="reviews">
-                    <i data-feather="star" width="18"></i> ОТЗЫВЫ
-                </button>
-                <button onclick="showSection('documents')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'documents' ? 'active' : ''}" data-section="documents">
-                    <i data-feather="file" width="18"></i> ДОКУМЕНТЫ
-                </button>
-            `;
-        }
+                    menuHtml = `
+                        <button onclick="showSection('personal')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'personal' ? 'active' : ''}" data-section="personal">
+                            <i data-feather="user" width="18"></i> ЛИЧНАЯ ИНФОРМАЦИЯ
+                        </button>
+                        <button onclick="showSection('incoming')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'incoming' ? 'active' : ''}" data-section="incoming">
+                            <i data-feather="inbox" width="18"></i> ЗАПРОСЫ НА БРОНИРОВАНИЕ
+                        </button>
+                        <button onclick="showSection('reviews')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'reviews' ? 'active' : ''}" data-section="reviews">
+                            <i data-feather="star" width="18"></i> ОТЗЫВЫ
+                        </button>
+                        <button onclick="showSection('documents')" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${activeSection === 'documents' ? 'active' : ''}" data-section="documents">
+                            <i data-feather="file" width="18"></i> ДОКУМЕНТЫ
+                        </button>
+                        <!-- НОВАЯ КНОПКА В СТИЛЕ МЕНЮ -->
+                        <a href="${addPropertyUrl}" class="menu-item w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium" style="background-color: #f3f4f6; color: #1f2937;">
+                            <i data-feather="plus-circle" width="18"></i> ДОБАВИТЬ ОБЪЯВЛЕНИЕ
+                        </a>
+                    `;
+}
         document.getElementById('menu').innerHTML = menuHtml;
         feather.replace();
     }
