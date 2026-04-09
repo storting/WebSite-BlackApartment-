@@ -4,6 +4,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-4v!($-hr=0*c&os+s!z(g3^me-vtp%zp9$hm^=_n-%ou7-+zrc'
 
+
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
@@ -102,3 +103,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 AUTH_USER_MODEL = 'BlackApp.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+YANDEX_API_KEY = '18d8b773-5924-4a29-8afc-8918512836c9'

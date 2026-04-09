@@ -1,4 +1,5 @@
 import os, re, shutil
+import requests
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator, EmailValidator, MinLengthValidator
@@ -225,6 +226,7 @@ class Property(models.Model):
     address = models.CharField('Адрес', max_length=255, db_index=True)
     latitude = models.FloatField('Широта', null=True, blank=True)
     longitude = models.FloatField('Долгота', null=True, blank=True)
+
     
     # Характеристики
     property_type = models.CharField('Тип', max_length=20, choices=PROPERTY_TYPES, db_index=True)
@@ -539,3 +541,6 @@ def delete_property_folder(sender, instance, **kwargs):
     folder_path = os.path.join(settings.MEDIA_ROOT, 'properties', str(instance.id))
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
+
+
+

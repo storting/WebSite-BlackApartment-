@@ -4,6 +4,20 @@
 {% block title %}{{ property.title }}{% endblock %}
 
 {% block extra_head %}
+
+
+{{ block.super }}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+    /* Чтобы карта не перекрывала выпадающие меню навигации */
+    .leaflet-container {
+        z-index: 0;
+    }
+</style>
+
 <style>
     .gallery-thumb {
         cursor: pointer;
@@ -104,7 +118,6 @@
             <h1 class="text-4xl font-bold text-noir-900">{{ property.title }}</h1>
             <div class="flex items-center gap-1 text-noir-500 text-base mt-2">
                 <i data-feather="map-pin" width="18"></i>
-                <span>{{ property.address }}</span>
             </div>
         </div>
         <div class="bg-noir-900 text-black px-6 py-3 rounded-xl whitespace-nowrap shadow-lg">
@@ -228,17 +241,23 @@
         </div>
     </div>
 
-    <!-- Нижний ряд: расположение и арендодатель -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <!-- Расположение -->
-        <div class="info-card">
-            <h2 class="text-2xl font-bold mb-4 text-noir-800 flex items-center gap-2">
-                <i data-feather="map-pin"></i> Расположение
-            </h2>
-            <p class="text-noir-700 text-base mb-4">{{ property.address }}</p>
-            <div class="h-48 bg-noir-100 rounded-xl flex items-center justify-center text-noir-500">
-                Карта будет здесь
-            </div>
+                            <!-- Нижний ряд: расположение и арендодатель -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                    <!-- Расположение с Яндекс.Картой -->
+                    <div class="info-card">
+                        <h2 class="text-2xl font-bold mb-4 text-noir-800 flex items-center gap-2">
+                            <i data-feather="map-pin"></i> Расположение
+                        </h2>
+                        <p class="text-noir-700 text-base mb-4">{{ property.address }}</p>
+                        
+                        {% if property.latitude and property.longitude %}
+                        <div id="yandex-map" style="height:300px; border-radius:12px; width:100%;"></div>
+                        {% else %}
+                        <div class="bg-noir-100 p-4 rounded-xl text-center text-noir-500">
+                            Координаты не указаны.
+                        </div>
+                        {% endif %}
+                </div>
         </div>
 
         <!-- Интерактивный календарь занятости -->
@@ -368,4 +387,37 @@
         document.getElementById('nextMonth').addEventListener('click', nextMonth);
     });
 </script>
+
+{{ block.super }}
+
+<!-- Яндекс.Карты -->
+<script src="https://api-maps.yandex.ru/2.1/?apikey={{ settings.YANDEX_API_KEY }}&lang=ru_RU" type="text/javascript"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if property.latitude and property.longitude %}
+        ymaps.ready(function() {
+            var map = new ymaps.Map('yandex-map', {
+                center: [{{ property.latitude }}, {{ property.longitude }}],
+                zoom: 16,
+                controls: ['zoomControl', 'fullscreenControl']
+            });
+            
+            var placemark = new ymaps.Placemark(
+                [{{ property.latitude }}, {{ property.longitude }}],
+                {
+                    balloonContent: '🏠 {{ property.title|escapejs }}<br>{{ property.address|escapejs }}'
+                },
+                {
+                    preset: 'islands#redHomeIcon'
+                }
+            );
+            
+            map.geoObjects.add(placemark);
+            // Отключаем зум колёсиком для удобства прокрутки страницы
+            map.behaviors.disable('scrollZoom');
+        });
+        {% endif %}
+    });
+</script>
 {% endblock %}
+

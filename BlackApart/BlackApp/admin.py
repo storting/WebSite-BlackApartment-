@@ -63,14 +63,14 @@ class PropertyImageInline(admin.TabularInline):
     fields = ['image', 'is_main', 'sort_order']
 
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'address', 'owner', 'price', 'moderation_status', 'created_at', 'views_count')
+    list_display = ('id', 'title', 'address', 'owner', 'price', 'moderation_status', 'created_at', 'views_count', 'latitude', 'longitude')
     list_filter = ('moderation_status', 'property_type', 'rooms', 'created_at')
     search_fields = ('title', 'address', 'description')
     list_editable = ('moderation_status',)
     readonly_fields = ('views_count', 'created_at', 'updated_at')
     fieldsets = (
         ('Основное', {
-            'fields': ('owner', 'title', 'description', 'address', 'property_type', 'price')
+            'fields': ('owner', 'title', 'description', 'address', 'latitude', 'longitude', 'property_type', 'price')
         }),
         ('Характеристики', {
             'fields': ('rooms', 'area', 'floor', 'floors_total')
@@ -90,6 +90,7 @@ class PropertyAdmin(admin.ModelAdmin):
     )
     inlines = [PropertyImageInline]
     actions = ['approve_properties', 'reject_properties']
+
 
     def approve_properties(self, request, queryset):
         updated = queryset.update(moderation_status='approved', moderated_at=timezone.now(), moderator=request.user)
