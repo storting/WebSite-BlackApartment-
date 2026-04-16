@@ -241,61 +241,22 @@
         </div>
     </div>
 
-                            <!-- Нижний ряд: расположение и арендодатель -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                                    <!-- Расположение с Яндекс.Картой -->
-                    <div class="info-card">
-                        <h2 class="text-2xl font-bold mb-4 text-noir-800 flex items-center gap-2">
-                            <i data-feather="map-pin"></i> Расположение
-                        </h2>
-                        <p class="text-noir-700 text-base mb-4">{{ property.address }}</p>
-                        
-                        {% if property.latitude and property.longitude %}
-                        <div id="yandex-map" style="height:300px; border-radius:12px; width:100%;"></div>
-                        {% else %}
-                        <div class="bg-noir-100 p-4 rounded-xl text-center text-noir-500">
-                            Координаты не указаны.
-                        </div>
-                        {% endif %}
-                </div>
-        </div>
-
-        <!-- Интерактивный календарь занятости -->
-        <div class="info-card mt-8">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-noir-800 flex items-center gap-2">
-                    <i data-feather="calendar"></i> Календарь занятости
-                </h2>
-                <div class="flex items-center gap-2">
-                    <button id="prevMonth" class="px-4 py-2 bg-noir-200 text-noir-800 rounded-l-lg hover:bg-noir-300 transition">&lt;</button>
-                    <span id="currentMonthYear" class="px-4 py-2 bg-noir-100 text-noir-800 font-medium"></span>
-                    <button id="nextMonth" class="px-4 py-2 bg-noir-200 text-noir-800 rounded-r-lg hover:bg-noir-300 transition">&gt;</button>
-                </div>
+    <!-- Нижний ряд: расположение и арендодатель (2 колонки) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Расположение с Яндекс.Картой -->
+        <div class="info-card">
+            <h2 class="text-2xl font-bold mb-4 text-noir-800 flex items-center gap-2">
+                <i data-feather="map-pin"></i> Расположение
+            </h2>
+            <p class="text-noir-700 text-base mb-4">{{ property.address }}</p>
+            
+            {% if property.latitude and property.longitude %}
+            <div id="yandex-map" style="height:300px; border-radius:12px; width:100%;"></div>
+            {% else %}
+            <div class="bg-noir-100 p-4 rounded-xl text-center text-noir-500">
+                Координаты не указаны.
             </div>
-
-            <!-- Заголовки дней недели -->
-            <div class="grid grid-cols-7 gap-1 text-center mb-2">
-                <div class="text-sm font-medium text-noir-600">Пн</div>
-                <div class="text-sm font-medium text-noir-600">Вт</div>
-                <div class="text-sm font-medium text-noir-600">Ср</div>
-                <div class="text-sm font-medium text-noir-600">Чт</div>
-                <div class="text-sm font-medium text-noir-600">Пт</div>
-                <div class="text-sm font-medium text-noir-600">Сб</div>
-                <div class="text-sm font-medium text-noir-600">Вс</div>
-            </div>
-
-            <!-- Сетка календаря -->
-            <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
-
-            <!-- Легенда -->
-            <div class="flex gap-4 mt-4 text-sm">
-                <span class="flex items-center gap-1">
-                    <span class="w-4 h-4 bg-yellow-400 rounded"></span> Занято
-                </span>
-                <span class="flex items-center gap-1">
-                    <span class="w-4 h-4 bg-white border border-noir-300 rounded"></span> Свободно
-                </span>
-            </div>
+            {% endif %}
         </div>
 
         <!-- Арендодатель -->
@@ -322,6 +283,44 @@
                     {% endif %}
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Интерактивный календарь занятости (на всю ширину) -->
+    <div class="info-card">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-noir-800 flex items-center gap-2">
+                <i data-feather="calendar"></i> Календарь занятости
+            </h2>
+            <div class="flex items-center gap-2">
+                <button id="prevMonth" class="px-4 py-2 bg-noir-200 text-noir-800 rounded-l-lg hover:bg-noir-300 transition">&lt;</button>
+                <span id="currentMonthYear" class="px-4 py-2 bg-noir-100 text-noir-800 font-medium"></span>
+                <button id="nextMonth" class="px-4 py-2 bg-noir-200 text-noir-800 rounded-r-lg hover:bg-noir-300 transition">&gt;</button>
+            </div>
+        </div>
+
+        <!-- Заголовки дней недели -->
+        <div class="grid grid-cols-7 gap-1 text-center mb-2">
+            <div class="text-sm font-medium text-noir-600">Пн</div>
+            <div class="text-sm font-medium text-noir-600">Вт</div>
+            <div class="text-sm font-medium text-noir-600">Ср</div>
+            <div class="text-sm font-medium text-noir-600">Чт</div>
+            <div class="text-sm font-medium text-noir-600">Пт</div>
+            <div class="text-sm font-medium text-noir-600">Сб</div>
+            <div class="text-sm font-medium text-noir-600">Вс</div>
+        </div>
+
+        <!-- Сетка календаря -->
+        <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+
+        <!-- Легенда -->
+        <div class="flex gap-4 mt-4 text-sm">
+            <span class="flex items-center gap-1">
+                <span class="w-4 h-4 bg-yellow-400 rounded"></span> Занято
+            </span>
+            <span class="flex items-center gap-1">
+                <span class="w-4 h-4 bg-white border border-noir-300 rounded"></span> Свободно
+            </span>
         </div>
     </div>
 </div>
@@ -420,4 +419,3 @@
     });
 </script>
 {% endblock %}
-
