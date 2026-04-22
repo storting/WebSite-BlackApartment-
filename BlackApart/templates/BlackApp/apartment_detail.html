@@ -344,7 +344,7 @@
         const daysInMonth = lastDay.getDate();
         
         let startDayOfWeek = firstDay.getDay();
-        // Преобразуем в понедельник-первый (пн=0, вт=1, ..., вс=6)
+        
         startDayOfWeek = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1;
 
         const calendarGrid = document.getElementById('calendarGrid');
@@ -413,7 +413,7 @@
             );
             
             map.geoObjects.add(placemark);
-            // Отключаем зум колёсиком для удобства прокрутки страницы
+            
             map.behaviors.disable('scrollZoom');
         });
         {% endif %}

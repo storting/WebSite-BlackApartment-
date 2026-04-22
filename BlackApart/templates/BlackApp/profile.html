@@ -508,7 +508,7 @@
 
 {% block extra_scripts %}
 <script>
-    // Переменные для переключения вкладок
+    
     let currentRole = '{{ user.user_type }}';
     let activeSection = 'personal';
     const addPropertyUrl = "{% url 'add_property' %}";
@@ -517,7 +517,7 @@
         document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
         document.getElementById(sectionId).classList.remove('hidden');
         activeSection = sectionId;
-        // Обновляем активный пункт меню
+        
         document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
         document.querySelector(`.menu-item[data-section="${sectionId}"]`).classList.add('active');
     }
