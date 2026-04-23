@@ -44,6 +44,8 @@ class User(AbstractUser):
         null=True
     )
     
+    birth_date = models.DateField('Дата рождения', null=True, blank=True)
+
     # Email уже есть в AbstractUser, добавим индекс для быстрого поиска
     email = models.EmailField('Email', db_index=True, unique=True)
     

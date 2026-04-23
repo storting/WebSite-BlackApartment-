@@ -260,3 +260,9 @@ label {
     min-width: 140px;
     text-align: center;
 }
+
+input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: white;
+}
