@@ -246,7 +246,7 @@
                                 <div><span class="text-noir-500">Имя:</span> {{ user.first_name }} {{ user.last_name }}</div>
                                 <div><span class="text-noir-500">Email:</span> {{ user.email }}</div>
                                 <div><span class="text-noir-500">Телефон:</span> {{ user.phone|default:'не указан' }}</div>
-                                <div><span class="text-noir-500">Дата рождения:</span> {{ user.birth_date|default:'не указана' }}</div>
+                                <div><span class="text-noir-500">Дата рождения:</span> {{ user.birth_date|date:"d.m.Y"|default:'не указана' }}</div>
                                 <div><span class="text-noir-500">Верификация:</span> 
                                     {% if user.landlord_profile.is_verified %}
                                         <span class="status-tag status-verified">ВЕРИФИЦИРОВАН</span>
@@ -257,7 +257,7 @@
                                 <div><span class="text-noir-500">Рейтинг:</span> {{ user.landlord_profile.rating|floatformat:1 }} ★ ({{ user.landlord_profile.reviews_count }})</div>
                                 <div><span class="text-noir-500">Баланс:</span> {{ user.landlord_profile.balance }} ₽</div>
                             </div>
-                            <button onclick="openEditModal()" class="mt-6 px-6 py-3 bg-noir-900 text-black rounded-xl hover:bg-noir-800 transition flex items-center gap-2">
+                            <button onclick="openEditModal()" class="mt-6 px-6 py-3 bg-black text-white rounded-xl hover:bg-black transition flex items-center gap-2">
                                 <i data-feather="edit-2" width="16"></i> РЕДАКТИРОВАТЬ
                             </button>
                         </div>
@@ -391,9 +391,6 @@
         <div id="landlordPropertiesBlock" class="mt-10">
             <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
                 <i data-feather="home"></i> МОИ ОБЪЕКТЫ
-                <a href="{% url 'add_property' %}" class="ml-auto px-6 py-2 bg-noir-900 text-white rounded-xl hover:bg-noir-800 transition text-sm flex items-center gap-2">
-                    <i data-feather="plus" width="16"></i> ДОБАВИТЬ
-                </a>
             </h2>
             <div class="space-y-4">
                 {% for prop in properties %}

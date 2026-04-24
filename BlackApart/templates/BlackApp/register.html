@@ -41,7 +41,7 @@
                         </div>
                     </div>
 
-                    <!-- Tenant Registration Form -->
+                    <!-- Tenant форма регистрации -->
                     <form id="tenantForm" class="space-y-6" method="POST" action="{% url 'register_tenant' %}">
                         {% csrf_token %}
                         <h3 class="text-3xl font-bold mb-6 text-center text-noir-900">АРЕНДАТОР РЕГИСТРАЦИЯ</h3>
@@ -86,7 +86,7 @@
                         <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium transition-all duration-300 rounded-lg">СОЗДАТЬ АККАУНТ</button>
                     </form>
 
-                    <!-- Landlord Registration Form -->
+                    <!-- Landlord форма регистрации -->
                     <form id="landlordForm" class="space-y-6 hidden" method="POST" action="{% url 'register_landlord' %}">
                         {% csrf_token %}
                         <h3 class="text-3xl font-bold mb-6 text-center text-noir-900">АРЕНДОДАТЕЛЬ РЕГИСТРАЦИЯ</h3>
@@ -120,9 +120,10 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Дата рождения *</label>
-                            <input type="date" id="landlord_dob" name="birth_date" class="form-control" required>
-                            {{ form.birth_date|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.birth_date.errors %}<div class="text-red-600 text-sm">{{ form.birth_date.errors }}</div>{% endif %}
+                            {{ form.birth_date|add_class:"w-full border border-noir-300 px-4 py-3 bg-black focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if form.birth_date.errors %}
+                                <div class="text-red-600 text-sm">{{ form.birth_date.errors }}</div>
+                            {% endif %}
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Пароль *</label>

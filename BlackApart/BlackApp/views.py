@@ -6,8 +6,10 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from .forms import TenantRegistrationForm, LandlordRegistrationForm, PropertyForm, DocumentForm 
 from .models import User, Property, PropertyImage, Favorite, Document, Review, Booking
+from django.db.models import Q
 from django.db import models
 from datetime import date, timedelta
+import re
 
 def index(request):
     latest_properties = Property.objects.filter(moderation_status='approved').order_by('-published_at')[:6]
@@ -163,8 +165,17 @@ def delete_document(request, doc_id):
 
 def apartment_list(request):
     properties = Property.objects.filter(moderation_status='approved').order_by('-published_at')
-    
+
+    address_query = request.GET.get('address', '').strip()
+    if address_query:
+        normalized = re.sub(r'^(г|город)\.?\s*', '', address_query, flags=re.IGNORECASE)
+        normalized = ' '.join(normalized.split())
+        
+        properties = properties.filter(
+            Q(address__icontains=normalized) | Q(title__icontains=normalized)
+        )
     property_type = request.GET.get('type')
+
     if property_type:
         properties = properties.filter(property_type=property_type)
     
@@ -179,12 +190,6 @@ def apartment_list(request):
     rooms = request.GET.get('rooms')
     if rooms:
         properties = properties.filter(rooms=rooms)
-    
-    query = request.GET.get('q')
-    if query:
-        properties = properties.filter(
-            models.Q(address__icontains=query) | models.Q(title__icontains=query)
-        )
     
     context = {
         'properties': properties,

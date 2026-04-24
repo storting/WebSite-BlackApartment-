@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User, TenantProfile, LandlordProfile, Property, PropertyImage, Document, Favorite, Booking, Review
-import json
+from django.core.exceptions import ValidationError
+import json, requests
 
 class TenantRegistrationForm(UserCreationForm):
     phone = forms.CharField(max_length=16, required=True, label='Телефон')
@@ -66,7 +67,8 @@ class LandlordRegistrationForm(UserCreationForm):
     birth_date = forms.DateField(
         required=True,
         label='Дата рождения',
-        widget=forms.DateInput(attrs={'type': 'date'})
+        widget=forms.DateInput(attrs={'type': 'date', 
+                                      'class': 'w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg'})
     )
 
     class Meta:
@@ -98,6 +100,15 @@ class PropertyForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 4}),
         }
 
+    def clean_address(self):
+        address = self.cleaned_data.get('address')
+        if address:
+            is_valid, message_or_address = validate_address_with_dadata(address)
+            if not is_valid:
+                raise ValidationError(message_or_address)
+            return message_or_address  
+        return address
+
 class PropertyImageForm(forms.ModelForm):
     class Meta:
         model = PropertyImage
@@ -110,3 +121,25 @@ class DocumentForm(forms.ModelForm):
         widgets = {
             'doc_type': forms.Select(attrs={'class': 'w-full border rounded-xl px-4 py-3'}),
         }
+
+def validate_address_with_dadata(address):
+    url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address"
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Token ВАШ_API_КЛЮЧ"
+    }
+    data = {"query": address}
+
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code == 200:
+        suggestions = response.json().get("suggestions", [])
+        if suggestions:
+            return True, suggestions[0]["value"]
+        else:
+            return False, "Адрес не найден. Пожалуйста, уточните его."
+    else:
+        return False, "Ошибка при проверке адреса. Попробуйте позже."
+
+    
