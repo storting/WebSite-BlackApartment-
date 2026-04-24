@@ -19,32 +19,54 @@ def index(request):
 
 def register_tenant(request):
     if request.method == 'POST':
-        form = TenantRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+        tenant_form = TenantRegistrationForm(request.POST)
+        if tenant_form.is_valid():
+            user = tenant_form.save()
             login(request, user)
             messages.success(request, 'Регистрация успешна! Добро пожаловать!')
             return redirect('index')
         else:
-            return render(request, 'BlackApp/register.html', {'form': form, 'form_type': 'tenant'})
+            # При ошибках заполнения возвращаем форму арендатора + пустую форму арендодателя
+            landlord_form = LandlordRegistrationForm()
+            return render(request, 'BlackApp/register.html', {
+                'tenant_form': tenant_form,
+                'landlord_form': landlord_form,
+                'form_type': 'tenant'
+            })
     else:
-        form = TenantRegistrationForm()
-        return render(request, 'BlackApp/register.html', {'form': form, 'form_type': 'tenant'})
+        tenant_form = TenantRegistrationForm()
+        landlord_form = LandlordRegistrationForm()
+        return render(request, 'BlackApp/register.html', {
+            'tenant_form': tenant_form,
+            'landlord_form': landlord_form,
+            'form_type': 'tenant'
+        })
+
 
 def register_landlord(request):
     if request.method == 'POST':
-        form = LandlordRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+        landlord_form = LandlordRegistrationForm(request.POST)
+        if landlord_form.is_valid():
+            user = landlord_form.save()
             login(request, user)
             messages.success(request, 'Регистрация успешна! Добро пожаловать!')
             return redirect('index')
         else:
-            return render(request, 'BlackApp/register.html', {'form': form, 'form_type': 'landlord'})
+            tenant_form = TenantRegistrationForm()
+            return render(request, 'BlackApp/register.html', {
+                'tenant_form': tenant_form,
+                'landlord_form': landlord_form,
+                'form_type': 'landlord'
+            })
     else:
-        form = LandlordRegistrationForm()
-        return render(request, 'BlackApp/register.html', {'form': form, 'form_type': 'landlord'})
-
+        tenant_form = TenantRegistrationForm()
+        landlord_form = LandlordRegistrationForm()
+        return render(request, 'BlackApp/register.html', {
+            'tenant_form': tenant_form,
+            'landlord_form': landlord_form,
+            'form_type': 'landlord'
+        })
+    
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')

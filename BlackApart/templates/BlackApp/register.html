@@ -12,6 +12,13 @@
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     {{ form_type|json_script:"form-type" }}
+    <style>
+        /* Гарантированное отображение иконки календаря, если глобальные стили используют appearance:none */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: block;
+            opacity: 1;
+        }
+    </style>
 </head>
 <body class="bg-noir-50 min-h-screen flex flex-col">
     <custom-navbar></custom-navbar>
@@ -48,40 +55,40 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Имя пользователя (ЗАПОМНИ!) *</label>
-                            {{ form.username|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.username.errors %}<div class="text-red-600 text-sm">{{ form.username.errors }}</div>{% endif %}
+                            {{ tenant_form.username|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if tenant_form.username.errors %}<div class="text-red-600 text-sm">{{ tenant_form.username.errors }}</div>{% endif %}
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Почта *</label>
-                            {{ form.email|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.email.errors %}<div class="text-red-600 text-sm">{{ form.email.errors }}</div>{% endif %}
+                            {{ tenant_form.email|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if tenant_form.email.errors %}<div class="text-red-600 text-sm">{{ tenant_form.email.errors }}</div>{% endif %}
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Номер телефона *</label>
-                            {{ form.phone|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.phone.errors %}<div class="text-red-600 text-sm">{{ form.phone.errors }}</div>{% endif %}
+                            {{ tenant_form.phone|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if tenant_form.phone.errors %}<div class="text-red-600 text-sm">{{ tenant_form.phone.errors }}</div>{% endif %}
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-noir-700 mb-2">Имя *</label>
-                                {{ form.first_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                                {% if form.first_name.errors %}<div class="text-red-600 text-sm">{{ form.first_name.errors }}</div>{% endif %}
+                                {{ tenant_form.first_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                                {% if tenant_form.first_name.errors %}<div class="text-red-600 text-sm">{{ tenant_form.first_name.errors }}</div>{% endif %}
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-noir-700 mb-2">Фамилия *</label>
-                                {{ form.last_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                                {% if form.last_name.errors %}<div class="text-red-600 text-sm">{{ form.last_name.errors }}</div>{% endif %}
+                                {{ tenant_form.last_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                                {% if tenant_form.last_name.errors %}<div class="text-red-600 text-sm">{{ tenant_form.last_name.errors }}</div>{% endif %}
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Пароль *</label>
-                            {{ form.password1|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.password1.errors %}<div class="text-red-600 text-sm">{{ form.password1.errors }}</div>{% endif %}
+                            {{ tenant_form.password1|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if tenant_form.password1.errors %}<div class="text-red-600 text-sm">{{ tenant_form.password1.errors }}</div>{% endif %}
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Подтверждение пароля *</label>
-                            {{ form.password2|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.password2.errors %}<div class="text-red-600 text-sm">{{ form.password2.errors }}</div>{% endif %}
+                            {{ tenant_form.password2|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if tenant_form.password2.errors %}<div class="text-red-600 text-sm">{{ tenant_form.password2.errors }}</div>{% endif %}
                         </div>
                         <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium transition-all duration-300 rounded-lg">СОЗДАТЬ АККАУНТ</button>
                     </form>
@@ -93,47 +100,47 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Имя пользователя (ЗАПОМНИ!) *</label>
-                            {{ form.username|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.username.errors %}<div class="text-red-600 text-sm">{{ form.username.errors }}</div>{% endif %}
+                            {{ landlord_form.username|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if landlord_form.username.errors %}<div class="text-red-600 text-sm">{{ landlord_form.username.errors }}</div>{% endif %}
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Почта *</label>
-                            {{ form.email|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.email.errors %}<div class="text-red-600 text-sm">{{ form.email.errors }}</div>{% endif %}
+                            {{ landlord_form.email|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if landlord_form.email.errors %}<div class="text-red-600 text-sm">{{ landlord_form.email.errors }}</div>{% endif %}
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Номер телефона *</label>
-                            {{ form.phone|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.phone.errors %}<div class="text-red-600 text-sm">{{ form.phone.errors }}</div>{% endif %}
+                            {{ landlord_form.phone|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if landlord_form.phone.errors %}<div class="text-red-600 text-sm">{{ landlord_form.phone.errors }}</div>{% endif %}
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-noir-700 mb-2">Имя *</label>
-                                {{ form.first_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                                {% if form.first_name.errors %}<div class="text-red-600 text-sm">{{ form.first_name.errors }}</div>{% endif %}
+                                {{ landlord_form.first_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                                {% if landlord_form.first_name.errors %}<div class="text-red-600 text-sm">{{ landlord_form.first_name.errors }}</div>{% endif %}
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-noir-700 mb-2">Фамилия *</label>
-                                {{ form.last_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                                {% if form.last_name.errors %}<div class="text-red-600 text-sm">{{ form.last_name.errors }}</div>{% endif %}
+                                {{ landlord_form.last_name|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                                {% if landlord_form.last_name.errors %}<div class="text-red-600 text-sm">{{ landlord_form.last_name.errors }}</div>{% endif %}
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Дата рождения *</label>
-                            {{ form.birth_date|add_class:"w-full border border-noir-300 px-4 py-3 bg-black focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.birth_date.errors %}
-                                <div class="text-red-600 text-sm">{{ form.birth_date.errors }}</div>
+                            {{ landlord_form.birth_date|add_class:"w-full border border-noir-300 px-4 py-3 bg-black focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if landlord_form.birth_date.errors %}
+                                <div class="text-red-600 text-sm">{{ landlord_form.birth_date.errors }}</div>
                             {% endif %}
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Пароль *</label>
-                            {{ form.password1|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.password1.errors %}<div class="text-red-600 text-sm">{{ form.password1.errors }}</div>{% endif %}
+                            {{ landlord_form.password1|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if landlord_form.password1.errors %}<div class="text-red-600 text-sm">{{ landlord_form.password1.errors }}</div>{% endif %}
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-noir-700 mb-2">Подтверждение пароля *</label>
-                            {{ form.password2|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
-                            {% if form.password2.errors %}<div class="text-red-600 text-sm">{{ form.password2.errors }}</div>{% endif %}
+                            {{ landlord_form.password2|add_class:"w-full border border-noir-300 px-4 py-3 bg-white focus:outline-none focus:border-noir-500 rounded-lg" }}
+                            {% if landlord_form.password2.errors %}<div class="text-red-600 text-sm">{{ landlord_form.password2.errors }}</div>{% endif %}
                         </div>
                         <button type="submit" class="bg-black w-full bg-noir-900 mt-6 text-white px-6 py-4 font-medium transition-all duration-300 rounded-lg">СОЗДАТЬ АККАУНТ</button>
                     </form>
@@ -171,7 +178,6 @@
             document.getElementById('landlordBtn').classList.add('bg-noir-900', 'text-white', 'border-noir-900');
             document.getElementById('tenantBtn').classList.remove('bg-noir-900', 'text-white', 'border-noir-900');
             document.getElementById('tenantBtn').classList.add('border-noir-300');
-            document.getElementById('landlordBtn').classList.remove('border-noir-300');
         }
 
         document.getElementById('tenantBtn').addEventListener('click', showTenantForm);
