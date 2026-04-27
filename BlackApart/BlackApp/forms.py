@@ -127,7 +127,7 @@ def validate_address_with_dadata(address):
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Authorization": "Token ВАШ_API_КЛЮЧ"
+        "Authorization": "Token 7f81793d693067004f13aa50bf1ca55d7b661c74"
     }
     data = {"query": address}
 
