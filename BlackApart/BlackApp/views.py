@@ -190,9 +190,28 @@ def apartment_list(request):
 
     address_query = request.GET.get('address', '').strip()
     if address_query:
+        # 1. Убираем "г", "г.", "город" в начале
         normalized = re.sub(r'^(г|город)\.?\s*', '', address_query, flags=re.IGNORECASE)
+        
+        # 2. Словарь замен сокращений
+        replacements = {
+            'пр-кт': 'проспект',
+            'пр-т': 'проспект',
+            'просп': 'проспект',
+            'ул': 'улица',
+            'пер': 'переулок',
+            'пл': 'площадь',
+            'б-р': 'бульвар',
+            'наб': 'набережная',
+            'ш': 'шоссе',
+        }
+        for short, full in replacements.items():
+            normalized = re.sub(r'\b' + re.escape(short) + r'\b', full, normalized, flags=re.IGNORECASE)
+        
+        # 3. Убираем лишние пробелы
         normalized = ' '.join(normalized.split())
         
+        # 4. Ищем
         properties = properties.filter(
             Q(address__icontains=normalized) | Q(title__icontains=normalized)
         )
