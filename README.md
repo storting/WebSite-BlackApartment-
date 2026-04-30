@@ -6,13 +6,11 @@
     Docker Engine + Docker Compose (входят в Docker Desktop или устанавливаются отдельно)
 
 Проверка:
-bash
 
 docker --version
 docker compose version
 
 # 2. Клонирование репозитория
-bash
 
 git clone https://github.com/startting/Website-Blackapartment-.git BlackApart
 cd BlackApart
@@ -24,7 +22,6 @@ bash
 
 nano .env
 
-text
 
 SECRET_KEY=секретный_ключ_сгенерируйте
 DEBUG=False
@@ -35,7 +32,6 @@ CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1
     python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 
 # 4. Запуск всех сервисов
-bash
 
 docker compose up -d --build
 
@@ -50,7 +46,6 @@ docker compose up -d --build
     Примечание: В данном проекте используется системный Nginx на хосте, но для портативности можно добавить контейнер с Nginx. Финальная конфигурация описана в docker-compose.yml.
 
 # 5. Проверка, что всё поднялось
-bash
 
 docker compose ps
 
@@ -65,24 +60,20 @@ docker compose ps
 # 7. Первичная настройка
 
 Примените миграции, соберите статику и создайте суперпользователя:
-bash
 
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py collectstatic --noinput
 docker compose exec web python manage.py createsuperuser
 
 # 8. Как остановить проект
-bash
 
 docker compose down
 
 Полная очистка (удаление томов с данными):
-bash
 
 docker compose down -v
 
 # 9. Полезные команды для диагностики
-bash
 
 # Логи контейнера
 docker compose logs -f web
@@ -94,7 +85,6 @@ docker compose up -d --build
 docker compose exec web bash
 
 # 10. Структура проекта (основные файлы)
-text
 
 BlackApart/
 ├── BlackApart/            # Django-проект (settings, wsgi) 
