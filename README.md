@@ -1,7 +1,7 @@
 # WebSite-BlackApartment-
 Основная цель заказчика - это заработок. Хотим решить проблемемы автоматизации процесса подбора недвижимости для клиента и презентабельность. Требования: Регистрация, выбор города, лента поиска, фильтрация, онлайн оплата, мини-карта. Рассматривается краткосрочная аренда. Проект должен быть выполнен в виде веб-сайта, с адаптивным интерфейсом.
 
-#1. Что нужно установить перед запуском
+# 1. Что нужно установить перед запуском
 
     Docker Engine + Docker Compose (входят в Docker Desktop или устанавливаются отдельно)
 
@@ -11,13 +11,13 @@ bash
 docker --version
 docker compose version
 
-#2. Клонирование репозитория
+# 2. Клонирование репозитория
 bash
 
 git clone https://github.com/startting/Website-Blackapartment-.git BlackApart
 cd BlackApart
 
-#3. Настройка окружения
+# 3. Настройка окружения
 
 Создайте файл .env (на основе примера ниже):
 bash
@@ -34,7 +34,7 @@ CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1
     Секретный ключ можно получить командой:
     python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 
-#4. Запуск всех сервисов
+# 4. Запуск всех сервисов
 bash
 
 docker compose up -d --build
@@ -49,20 +49,20 @@ docker compose up -d --build
 
     Примечание: В данном проекте используется системный Nginx на хосте, но для портативности можно добавить контейнер с Nginx. Финальная конфигурация описана в docker-compose.yml.
 
-#5. Проверка, что всё поднялось
+# 5. Проверка, что всё поднялось
 bash
 
 docker compose ps
 
 Вывод должен показывать статус Up для сервиса web.
 
-#6. Адреса после запуска
+# 6. Адреса после запуска
 
     Сайт: http://localhost (или IP сервера)
 
     Админка Django: http://localhost/admin
 
-#7. Первичная настройка
+# 7. Первичная настройка
 
 Примените миграции, соберите статику и создайте суперпользователя:
 bash
@@ -71,7 +71,7 @@ docker compose exec web python manage.py migrate
 docker compose exec web python manage.py collectstatic --noinput
 docker compose exec web python manage.py createsuperuser
 
-#8. Как остановить проект
+# 8. Как остановить проект
 bash
 
 docker compose down
@@ -81,7 +81,7 @@ bash
 
 docker compose down -v
 
-#9. Полезные команды для диагностики
+# 9. Полезные команды для диагностики
 bash
 
 # Логи контейнера
@@ -93,21 +93,21 @@ docker compose up -d --build
 # Вход в контейнер
 docker compose exec web bash
 
-#10. Структура проекта (основные файлы)
+# 10. Структура проекта (основные файлы)
 text
 
 BlackApart/
-├── BlackApart/            # Django-проект (settings, wsgi)
-├── BlackApp/              # Приложение
-├── templates/             # Шаблоны
-├── static/                # Исходная статика
-├── media/                 # Загруженные файлы (том на хосте)
-├── requirements.txt       # Зависимости Python
-├── Dockerfile             # Сборка образа
-├── docker-compose.yml     # Оркестрация
-└── .env                   # Переменные окружения
+├── BlackApart/            # Django-проект (settings, wsgi) 
+├── BlackApp/              # Приложение 
+├── templates/             # Шаблоны 
+├── static/                # Исходная статика 
+├── media/                 # Загруженные файлы (том на хосте) 
+├── requirements.txt       # Зависимости Python 
+├── Dockerfile             # Сборка образа 
+├── docker-compose.yml     # Оркестрация 
+└── .env                   # Переменные окружения 
 
-#11. Для разработчиков (локальная среда)
+# 11. Для разработчиков (локальная среда)
 
 Если нужно разрабатывать без Docker:
 
@@ -120,7 +120,7 @@ BlackApart/
     Запуск: python manage.py runserver
 
 Но рекомендуемый способ для тестирования и деплоя — только через Docker.
-#12. Если что-то не работает
+# 12. Если что-то не работает
 
     Проверьте, что Docker работает: docker ps
 
